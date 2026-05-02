@@ -14,14 +14,14 @@ An end-to-end data engineering pipeline that scrapes real-time job market data, 
 
 ```mermaid
 graph TD
-    A[Job Boards: LinkedIn, Wuzzuf] -->|Playwright Scraping| B(Raw Job Descriptions)
-    B -->|AgentRouter API: Claude Haiku| C{Dynamic Skill Extraction}
-    C -->|Structured Data| D[(SQLite / Parquet)]
-    D -->|Aggregation| E[Top 15 In-Demand Skills]
-    E -->|AgentRouter API: Roadmap Logic| F[Pedagogical Learning Roadmap]
-    F -->|Markdown Export| G[output/roadmap_data_engineer.md]
-    E -->|Plotly Visualizations| H{Streamlit Web Dashboard}
-    F -->|Interactive UI| H
+    A["Job Boards: LinkedIn, Wuzzuf"] -->|"Playwright Scraping"| B("Raw Job Descriptions")
+    B -->|"AgentRouter API: Claude Haiku"| C{"Dynamic Skill Extraction"}
+    C -->|"Structured Data"| D[("SQLite / Parquet")]
+    D -->|"Aggregation"| E["Top 15 In-Demand Skills"]
+    E -->|"Roadmap Logic"| F["Pedagogical Learning Roadmap"]
+    F -->|"Markdown Export"| G["output/roadmap_data_engineer.md"]
+    E -->|"Plotly Visualizations"| H{"Streamlit Web Dashboard"}
+    F -->|"Interactive UI"| H
 ```
 
 ---
