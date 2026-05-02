@@ -4,13 +4,13 @@ This guide explains how to execute the data pipelines and generate learning road
 
 ## 1. Automated Pipeline (Recommended)
 
-The easiest way to run the entire project—from data extraction to roadmap generation and launching the Streamlit dashboard—is to use the single automation script.
+The easiest way to execute the core ETL process is to use the automation script.
 
 **Execution:**
 ```bash
 python automate.py
 ```
-This script will sequentially run the scraper, generate the default roadmaps, and automatically host the Streamlit dashboard.
+This script will sequentially run the scraper and generate the default roadmaps. To view the UI, you must launch the Docker containers (see section 2).
 
 ---
 
@@ -22,7 +22,7 @@ You can run the entire pipeline in an isolated container without installing depe
 ```bash
 docker-compose up --build
 ```
-This will build the image, run the `automate.py` pipeline internally, and map the Streamlit dashboard to `http://localhost:8501`.
+This will build the images, run the `etl-worker` pipeline internally, host the `api-backend`, and map the Next.js frontend to `http://localhost:3000`.
 
 ---
 
@@ -65,20 +65,23 @@ def main():
     # ...
 ```
 
-## 5. Streamlit Interactive Dashboard
+## 5. Next.js Web Frontend
 
-For a more user-friendly experience, you can use the Streamlit web application. This interface allows you to visually explore the top skills and generate roadmaps with a single click.
+For a more user-friendly experience, you can use the Next.js web application. This interface allows you to visually explore the top skills and generate roadmaps with a single click.
 
 **Execution:**
+Ensure the FastAPI backend is running, then start the development server:
 ```bash
-streamlit run app.py
+cd web
+npm install
+npm run dev
 ```
+Navigate to `http://localhost:3000` in your browser.
 
 **Features:**
-- View high-level metrics about the scraped data.
-- Select target roles dynamically from a sidebar.
-- Visualize the top 15 most requested skills via an interactive Plotly chart.
-- Generate and download Claude AI roadmaps directly from the browser.
+- Visually configure target profiles from the sidebar.
+- Visualize the top 15 most requested skills via an interactive Recharts bar chart.
+- Generate and view Claude AI roadmaps rendered cleanly via react-markdown.
 
 ## 6. Jupyter Notebook Walkthrough
 

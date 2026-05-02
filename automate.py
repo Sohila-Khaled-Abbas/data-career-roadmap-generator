@@ -25,16 +25,12 @@ def run_pipeline():
         print(f"❌ Roadmap generation failed with error: {e}")
         return
 
-    # Step 3: Launch Streamlit Dashboard
-    print("[3/3] Launching Streamlit Dashboard...")
-    try:
-        # Running streamlit dynamically and waiting for it to be interrupted by user
-        print("ℹ️ The dashboard will open in your default browser. Press Ctrl+C to stop.")
-        subprocess.run(["streamlit", "run", "streamlit_app/app.py"], check=True)
-    except KeyboardInterrupt:
-        print("\n🛑 Pipeline stopped by user.")
-    except subprocess.CalledProcessError as e:
-        print(f"❌ Streamlit failed with error: {e}")
+    # Step 3: Launch Full Stack
+    print("[3/3] The pipeline is now decoupled.")
+    print("ℹ️ To launch the FastAPI backend and Next.js frontend, please use Docker:")
+    print("    docker-compose up --build")
+    print("    - API available at: http://localhost:8000")
+    print("    - Web App available at: http://localhost:3000")
 
 if __name__ == "__main__":
     run_pipeline()

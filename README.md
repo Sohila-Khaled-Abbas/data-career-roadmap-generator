@@ -4,13 +4,13 @@
 [![Playwright](https://img.shields.io/badge/Playwright-Automated_Scraping-green?logo=playwright)](https://playwright.dev/)
 [![AgentRouter](https://img.shields.io/badge/AgentRouter-API-purple)](https://agentrouter.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-Backend_API-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-Interactive_Dashboard-FF4B4B?logo=streamlit)](https://streamlit.io/)
+[![Next.js](https://img.shields.io/badge/Next.js-React_Framework-black?logo=next.js)](https://nextjs.org/)
 [![Jupyter](https://img.shields.io/badge/Jupyter-Interactive_Notebook-F37626?logo=jupyter&logoColor=white)](https://jupyter.org/)
 [![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-An end-to-end data engineering pipeline that scrapes real-time job market data, extracts technical skills using Claude AI (via AgentRouter), and powers an interactive Streamlit dashboard to generate sequential learning roadmaps bridging the gap between job seekers and market demand.
+An end-to-end data engineering pipeline that scrapes real-time job market data, extracts technical skills using Claude AI (via AgentRouter), and powers an interactive Next.js web application to generate sequential learning roadmaps bridging the gap between job seekers and market demand.
 
 ---
 
@@ -31,7 +31,7 @@ graph TD
     D -->|"Aggregation"| E["Top 15 In-Demand Skills"]:::database
     E -->|"Roadmap Logic"| F["Pedagogical Learning Roadmap"]:::ai
     F -->|"Markdown Export"| G["output/roadmap_data_engineer.md"]:::file
-    E -->|"Plotly Visualizations"| H{"Streamlit Web Dashboard"}:::ui
+    E -->|"Plotly Visualizations"| H{"Next.js Web Frontend"}:::ui
     F -->|"Interactive UI"| H
 ```
 
@@ -44,7 +44,7 @@ graph TD
 - **Smart Aggregation**: Ranks skills by frequency across different job profiles (Data Engineer, Analyst, ML Engineer, etc.).
 - **Sequential Roadmaps**: Generates logical learning paths that explain *why* tools should be learned in a specific order (e.g., Python before Airflow).
 - **Clean Data Storage**: Exports structured data to both high-performance **Parquet** files and queryable **SQLite** databases.
-- **Interactive Web Dashboard**: Features a beautiful Streamlit application with Plotly charts for dynamic exploration of job market insights and 1-click roadmap generation.
+- **Interactive Web Dashboard**: Features a beautiful Next.js application using Recharts for dynamic exploration of job market insights and 1-click roadmap generation.
 
 ---
 
@@ -62,11 +62,13 @@ roadmap_webscraping/
 ├── docker-compose.yml    # Docker services config
 ├── Dockerfile          # Container build instructions
 ├── automate.py         # 1-Click Pipeline Orchestrator
-├── notebooks/          # Interactive Jupyter Notebooks
-│   └── Data_Career_Roadmap.ipynb
-├── streamlit_app/      # Interactive Web Dashboard
-│   ├── app.py
-│   └── .streamlit/config.toml
+├── docker/             # Dockerfiles for microservices
+│   ├── etl.Dockerfile
+│   ├── api.Dockerfile
+│   └── web.Dockerfile
+├── web/                # Next.js Web Frontend
+│   ├── src/app/        # React components and styling
+│   └── package.json    # Node dependencies
 ├── output/             # Generated Markdown roadmaps
 ├── .gitignore          # Environment & data exclusions
 ├── CONTRIBUTING.md     # Guidelines for contributing
@@ -96,7 +98,7 @@ For detailed instructions on how to set up and use the project, please refer to 
 - **Database**: SQLite3
 - **Storage**: Apache Parquet
 - **Backend API**: FastAPI, Uvicorn, Pydantic
-- **Web Frontend**: Streamlit
+- **Web Frontend**: Next.js (React), Recharts
 - **Data Visualization**: Plotly
 - **Interactive Environment**: Jupyter Notebook
 - **Containerization**: Docker & Docker Compose
