@@ -25,13 +25,13 @@ graph TD
     classDef ui fill:#db2777,stroke:#be185d,stroke-width:2px,color:#fff,rx:8px,ry:8px
     classDef file fill:#d97706,stroke:#b45309,stroke-width:2px,color:#fff,rx:8px,ry:8px
 
-    A["Job Boards: LinkedIn, Wuzzuf, Indeed, Glassdoor"]:::scraper -->|Playwright Scraping| B("Raw Job Descriptions"):::scraper
-    B -->|AgentRouter API: Claude Haiku| C("Dynamic Skill Extraction"):::ai
-    C -->|Structured Data| D[("SQLite / Parquet")]:::database
+    A["Job Boards: LinkedIn, Wuzzuf, Indeed, Glassdoor"]:::scraper -->|Playwright Scraping| B["Raw Job Descriptions"]:::scraper
+    B -->|AgentRouter API: Claude Haiku| C["Dynamic Skill Extraction"]:::ai
+    C -->|Structured Data| D["SQLite / Parquet"]:::database
     D -->|Aggregation| E["Top 15 In-Demand Skills"]:::database
     E -->|Roadmap Logic| F["Pedagogical Learning Roadmap"]:::ai
     F -->|Markdown Export| G["output/roadmap_data_engineer.md"]:::file
-    E -->|Plotly Visualizations| H("Next.js Web Frontend"):::ui
+    E -->|Plotly Visualizations| H["Next.js Web Frontend"]:::ui
     F -->|Interactive UI| H
 ```
 
