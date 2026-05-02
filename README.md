@@ -35,7 +35,7 @@ graph TD
 
 ## Key Features
 
-- **Multi-Source Scraping**: Utilizes Playwright to navigate complex DOM structures of major job boards (LinkedIn, Wuzzuf).
+- **Multi-Source Scraping**: Utilizes Playwright to navigate complex DOM structures of major job boards (LinkedIn, Wuzzuf, Indeed, Glassdoor).
 - **AI-Powered Extraction**: Leverages `claude-haiku-4-5-20251001` through the AgentRouter API to identify technical tools and frameworks from unstructured text, avoiding brittle regex.
 - **Smart Aggregation**: Ranks skills by frequency across different job profiles (Data Engineer, Analyst, ML Engineer, etc.).
 - **Sequential Roadmaps**: Generates logical learning paths that explain *why* tools should be learned in a specific order (e.g., Python before Airflow).
@@ -53,8 +53,14 @@ roadmap_webscraping/
 ├── scripts/            # Core Python pipeline components
 │   ├── scraper_pipeline.py    # ETL: Extract, AI-Transform, Load
 │   └── roadmap_generator.py   # Analysis & Roadmap Generation
-├── Data_Career_Roadmap.ipynb # Interactive Jupyter Notebook Pipeline
-├── app.py              # Streamlit Web Dashboard
+├── docker-compose.yml    # Docker services config
+├── Dockerfile          # Container build instructions
+├── automate.py         # 1-Click Pipeline Orchestrator
+├── notebooks/          # Interactive Jupyter Notebooks
+│   └── Data_Career_Roadmap.ipynb
+├── streamlit_app/      # Interactive Web Dashboard
+│   ├── app.py
+│   └── .streamlit/config.toml
 ├── output/             # Generated Markdown roadmaps
 ├── .gitignore          # Environment & data exclusions
 ├── LICENSE             # MIT License
@@ -85,6 +91,7 @@ For detailed instructions on how to set up and use the project, please refer to 
 - **Web Frontend**: Streamlit
 - **Data Visualization**: Plotly
 - **Interactive Environment**: Jupyter Notebook
+- **Containerization**: Docker & Docker Compose
 
 ---
 

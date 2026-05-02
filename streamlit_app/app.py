@@ -6,7 +6,8 @@ import sys
 from collections import Counter
 
 # Add scripts directory to path to import roadmap generator
-sys.path.append(os.path.join(os.path.dirname(__file__), 'scripts'))
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(os.path.join(ROOT_DIR, 'scripts'))
 from roadmap_generator import generate_roadmap_with_llm
 
 # Page Configuration
@@ -58,7 +59,7 @@ st.markdown("<p class='sub-title'>Discover the most in-demand technical skills i
 
 @st.cache_data
 def load_data():
-    parquet_path = "data/egypt_data_skills.parquet"
+    parquet_path = os.path.join(ROOT_DIR, "data", "egypt_data_skills.parquet")
     if os.path.exists(parquet_path):
         return pd.read_parquet(parquet_path)
     return pd.DataFrame()
@@ -141,8 +142,8 @@ if selected_profile:
                             st.success("Roadmap Generated Successfully!")
                             
                             # Save to output folder
-                            filename = f"output/roadmap_{selected_profile.replace(' ', '_').lower()}.md"
-                            os.makedirs("output", exist_ok=True)
+                            filename = os.path.join(ROOT_DIR, "output", f"roadmap_{selected_profile.replace(' ', '_').lower()}.md")
+                            os.makedirs(os.path.join(ROOT_DIR, "output"), exist_ok=True)
                             with open(filename, 'w', encoding='utf-8') as f:
                                 f.write(roadmap_md)
                             

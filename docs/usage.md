@@ -2,7 +2,31 @@
 
 This guide explains how to execute the data pipelines and generate learning roadmaps.
 
-## 1. Data Extraction Pipeline
+## 1. Automated Pipeline (Recommended)
+
+The easiest way to run the entire project—from data extraction to roadmap generation and launching the Streamlit dashboard—is to use the single automation script.
+
+**Execution:**
+```bash
+python automate.py
+```
+This script will sequentially run the scraper, generate the default roadmaps, and automatically host the Streamlit dashboard.
+
+---
+
+## 2. Docker Execution
+
+You can run the entire pipeline in an isolated container without installing dependencies locally.
+
+**Execution:**
+```bash
+docker-compose up --build
+```
+This will build the image, run the `automate.py` pipeline internally, and map the Streamlit dashboard to `http://localhost:8501`.
+
+---
+
+## 3. Manual Data Extraction Pipeline
 
 The scraper pipeline searches for job listings, extracts the job descriptions, and utilizes the AgentRouter API to dynamically identify technical skills.
 
@@ -17,7 +41,7 @@ python scripts/scraper_pipeline.py
 - Sends raw job descriptions to the `claude-haiku-4-5-20251001` model for strict JSON array extraction of tools.
 - Saves the aggregated data into `data/egypt_data_skills.parquet` and `data/market_trends.db`.
 
-## 2. Roadmap Generation Pipeline
+## 4. Manual Roadmap Generation Pipeline
 
 The roadmap generator reads the processed data, calculates frequency distributions for a specific role, and prompts the LLM to build a sequential learning path.
 
@@ -41,7 +65,7 @@ def main():
     # ...
 ```
 
-## 3. Streamlit Interactive Dashboard
+## 5. Streamlit Interactive Dashboard
 
 For a more user-friendly experience, you can use the Streamlit web application. This interface allows you to visually explore the top skills and generate roadmaps with a single click.
 
@@ -56,13 +80,13 @@ streamlit run app.py
 - Visualize the top 15 most requested skills via an interactive Plotly chart.
 - Generate and download Claude AI roadmaps directly from the browser.
 
-## 4. Jupyter Notebook Walkthrough
+## 6. Jupyter Notebook Walkthrough
 
 For learners and developers who want to understand the code execution step-by-step, the project includes an interactive Jupyter Notebook (`Data_Career_Roadmap.ipynb`).
 
 **Execution:**
 ```bash
-jupyter notebook Data_Career_Roadmap.ipynb
+jupyter notebook notebooks/Data_Career_Roadmap.ipynb
 ```
 
 **Features:**

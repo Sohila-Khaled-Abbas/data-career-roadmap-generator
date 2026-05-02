@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+.git/
+.vscode/
+.idea/
+.DS_Store
+data/*.db
+data/*.parquet
+output/*.md

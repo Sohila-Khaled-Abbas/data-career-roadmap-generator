@@ -34,13 +34,41 @@ class LinkedInScraper(JobBoardScraper):
     def fetch(self, job_title, location, page):
         print(f"  -> Targeting LinkedIn specific DOM for {job_title}")
         time.sleep(0.5) 
-        return [{"title": f"LinkedIn {job_title}", "company": "Global AI", "description": "PyTorch, AWS, Kubernetes and Dagster required."}]
+        return [
+            {"title": f"Senior {job_title}", "company": "Global AI", "description": "PyTorch, AWS, Kubernetes and Dagster required."},
+            {"title": f"{job_title} Specialist", "company": "Tech Corp", "description": "Strong SQL, Python, and Snowflake experience."},
+            {"title": f"Junior {job_title}", "company": "DataWorks", "description": "Looking for skills in Python, pandas, and basic AWS."}
+        ]
 
 class WuzzufScraper(JobBoardScraper):
     def fetch(self, job_title, location, page):
         print(f"  -> Targeting Wuzzuf specific DOM for {job_title}")
         time.sleep(0.5)
-        return [{"title": f"Wuzzuf {job_title}", "company": "Local Tech Egypt", "description": "SQL, Power BI, Python and dbt needed."}]
+        return [
+            {"title": f"{job_title}", "company": "Local Tech Egypt", "description": "SQL, Power BI, Python and dbt needed."},
+            {"title": f"Lead {job_title}", "company": "FinTech EG", "description": "Advanced Airflow, Spark, and Postgres experience."},
+            {"title": f"{job_title} Consultant", "company": "Consulting EG", "description": "Tableau, SQL Server, and Azure Data Factory."}
+        ]
+
+class IndeedScraper(JobBoardScraper):
+    def fetch(self, job_title, location, page):
+        print(f"  -> Targeting Indeed specific DOM for {job_title}")
+        time.sleep(0.5)
+        return [
+            {"title": f"{job_title} II", "company": "MNC Inc", "description": "BigQuery, Looker, Python, and GCP."},
+            {"title": f"{job_title} Engineer", "company": "StartupX", "description": "Fast-paced environment using Kafka, Rust, and AWS."},
+            {"title": f"Remote {job_title}", "company": "GlobalTech", "description": "Require dbt, Snowflake, and Python."}
+        ]
+
+class GlassdoorScraper(JobBoardScraper):
+    def fetch(self, job_title, location, page):
+        print(f"  -> Targeting Glassdoor specific DOM for {job_title}")
+        time.sleep(0.5)
+        return [
+            {"title": f"{job_title} Manager", "company": "Data Insights", "description": "Managing team, hands-on with Python, SQL, AWS."},
+            {"title": f"Staff {job_title}", "company": "MegaCorp", "description": "Scala, Hadoop, Spark, and Python."},
+            {"title": f"{job_title} Intern", "company": "DevShop", "description": "Learning SQL, Python, and Git."}
+        ]
 
 def fetch_job_listings_playwright(job_title, location="Egypt"):
     """
@@ -49,7 +77,7 @@ def fetch_job_listings_playwright(job_title, location="Egypt"):
     print(f"\nLaunching headless browser fleet to search for: {job_title} in {location}...")
     extracted_jobs = []
     
-    target_boards = [LinkedInScraper(), WuzzufScraper()] 
+    target_boards = [LinkedInScraper(), WuzzufScraper(), IndeedScraper(), GlassdoorScraper()] 
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
