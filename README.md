@@ -53,6 +53,7 @@ roadmap_webscraping/
 ├── scripts/            # Core Python pipeline components
 │   ├── scraper_pipeline.py    # ETL: Extract, AI-Transform, Load
 │   └── roadmap_generator.py   # Analysis & Roadmap Generation
+├── Data_Career_Roadmap.ipynb # Interactive Jupyter Notebook Pipeline
 ├── app.py              # Streamlit Web Dashboard
 ├── output/             # Generated Markdown roadmaps
 ├── .gitignore          # Environment & data exclusions
@@ -83,6 +84,7 @@ For detailed instructions on how to set up and use the project, please refer to 
 - **Storage**: Apache Parquet
 - **Web Frontend**: Streamlit
 - **Data Visualization**: Plotly
+- **Interactive Environment**: Jupyter Notebook
 
 ---
 

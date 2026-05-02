@@ -55,3 +55,18 @@ streamlit run app.py
 - Select target roles dynamically from a sidebar.
 - Visualize the top 15 most requested skills via an interactive Plotly chart.
 - Generate and download Claude AI roadmaps directly from the browser.
+
+## 4. Jupyter Notebook Walkthrough
+
+For learners and developers who want to understand the code execution step-by-step, the project includes an interactive Jupyter Notebook (`Data_Career_Roadmap.ipynb`).
+
+**Execution:**
+```bash
+jupyter notebook Data_Career_Roadmap.ipynb
+```
+
+**Features:**
+- Step-by-step execution of the scraping logic.
+- Real-time interaction with the AgentRouter Claude AI model for skill extraction.
+- Inline preview of the Pandas DataFrame.
+- Saving Parquet, SQLite, and Markdown roadmap files directly to the `output/` folder.

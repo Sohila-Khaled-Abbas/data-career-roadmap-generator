@@ -4,3 +4,5 @@ requests
 pyarrow
 streamlit
 plotly
+jupyter
+ipykernel
