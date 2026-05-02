@@ -77,7 +77,7 @@ def extract_skills_dynamically(description_text):
     if not API_KEY:
         return []
 
-    url = "https://openrouter.ai/api/v1/chat/completions"
+    url = "https://agentrouter.org/v1/chat/completions"
     
     system_instruction = """
     You are a data extraction bot. Your sole purpose is to read a job description and extract 
@@ -88,7 +88,7 @@ def extract_skills_dynamically(description_text):
     """
 
     payload = {
-        "model": "google/gemini-2.5-flash",
+        "model": "claude-haiku-4-5-20251001",
         "messages": [
             {"role": "system", "content": system_instruction},
             {"role": "user", "content": description_text}
@@ -97,7 +97,10 @@ def extract_skills_dynamically(description_text):
     
     headers = {
         'Content-Type': 'application/json',
-        'Authorization': f'Bearer {API_KEY}'
+        'Authorization': f'Bearer {API_KEY}',
+        'Originator': 'codex_cli_rs',
+        'Version': '0.101.0',
+        'User-Agent': 'codex_cli_rs/0.101.0 (Mac OS 26.0.1; arm64) Apple_Terminal/464'
     }
     
     delays = [1, 2, 4, 8, 16]

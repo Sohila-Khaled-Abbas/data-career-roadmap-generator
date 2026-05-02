@@ -4,7 +4,7 @@ This guide explains how to execute the data pipelines and generate learning road
 
 ## 1. Data Extraction Pipeline
 
-The scraper pipeline searches for job listings, extracts the job descriptions, and utilizes the OpenRouter API to dynamically identify technical skills.
+The scraper pipeline searches for job listings, extracts the job descriptions, and utilizes the AgentRouter API to dynamically identify technical skills.
 
 **Execution:**
 ```bash
@@ -14,7 +14,7 @@ python scripts/scraper_pipeline.py
 **Process:**
 - Launches headless Playwright browser instances.
 - Targets specific profiles defined in `TARGET_PROFILES` (e.g., Data Engineer, ML Engineer).
-- Sends raw job descriptions to the `google/gemini-2.5-flash` model for strict JSON array extraction of tools.
+- Sends raw job descriptions to the `claude-haiku-4-5-20251001` model for strict JSON array extraction of tools.
 - Saves the aggregated data into `data/egypt_data_skills.parquet` and `data/market_trends.db`.
 
 ## 2. Roadmap Generation Pipeline

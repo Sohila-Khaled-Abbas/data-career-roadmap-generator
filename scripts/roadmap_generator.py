@@ -43,7 +43,7 @@ def generate_roadmap_with_llm(profile, skills):
     """
     print(f"Analyzing pedagogical dependencies for {profile} based on top skills: {skills}...")
     
-    url = "https://openrouter.ai/api/v1/chat/completions"
+    url = "https://agentrouter.org/v1/chat/completions"
     
     system_instruction = """
     You are a strict, senior technical lead and mentor. 
@@ -56,7 +56,7 @@ def generate_roadmap_with_llm(profile, skills):
     user_prompt = f"Profile: {profile}\nTarget Skills based on market data: {', '.join(skills)}\n\nGenerate a sequential learning roadmap in Markdown."
 
     payload = {
-        "model": "google/gemini-2.5-flash",
+        "model": "claude-haiku-4-5-20251001",
         "messages": [
             {"role": "system", "content": system_instruction},
             {"role": "user", "content": user_prompt}
@@ -65,7 +65,10 @@ def generate_roadmap_with_llm(profile, skills):
     
     headers = {
         'Content-Type': 'application/json',
-        'Authorization': f'Bearer {API_KEY}'
+        'Authorization': f'Bearer {API_KEY}',
+        'Originator': 'codex_cli_rs',
+        'Version': '0.101.0',
+        'User-Agent': 'codex_cli_rs/0.101.0 (Mac OS 26.0.1; arm64) Apple_Terminal/464'
     }
     
     # Implementing exponential backoff as required

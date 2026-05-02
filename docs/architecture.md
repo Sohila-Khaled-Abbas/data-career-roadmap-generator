@@ -9,7 +9,7 @@ The project utilizes **Playwright** to interact with modern, Javascript-heavy we
 
 ### Dynamic Skill Extraction via LLM
 Traditional skill extraction relies on static regex lists (e.g., `(?i)\b(python|sql|aws)\b`), which quickly become outdated and miss context. 
-This system replaces regex with dynamic LLM inference. It sends the raw job description to the **OpenRouter API** utilizing the `google/gemini-2.5-flash` model. 
+This system replaces regex with dynamic LLM inference. It sends the raw job description to the **AgentRouter API** utilizing the `claude-haiku-4-5-20251001` model. 
 
 The prompt strictly enforces a JSON array output consisting solely of technical skills, filtering out soft skills and irrelevant text. Exponential backoff is implemented to respect API rate limits.
 
