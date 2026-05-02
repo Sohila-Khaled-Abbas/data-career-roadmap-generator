@@ -4,8 +4,9 @@
 [![Playwright](https://img.shields.io/badge/Playwright-Automated_Scraping-green?logo=playwright)](https://playwright.dev/)
 [![AgentRouter](https://img.shields.io/badge/AgentRouter-API-purple)](https://agentrouter.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Interactive_Dashboard-FF4B4B?logo=streamlit)](https://streamlit.io/)
 
-An end-to-end data engineering pipeline that scrapes real-time job market data, extracts technical skills using Claude AI (via AgentRouter), and generates sequential learning roadmaps to bridge the gap between job seekers and market demand.
+An end-to-end data engineering pipeline that scrapes real-time job market data, extracts technical skills using Claude AI (via AgentRouter), and powers an interactive Streamlit dashboard to generate sequential learning roadmaps bridging the gap between job seekers and market demand.
 
 ---
 
@@ -19,6 +20,8 @@ graph TD
     D -->|Aggregation| E[Top 15 In-Demand Skills]
     E -->|AgentRouter API: Roadmap Logic| F[Pedagogical Learning Roadmap]
     F -->|Markdown Export| G[output/roadmap_data_engineer.md]
+    E -->|Plotly Visualizations| H{Streamlit Web Dashboard}
+    F -->|Interactive UI| H
 ```
 
 ---
@@ -30,6 +33,7 @@ graph TD
 - **Smart Aggregation**: Ranks skills by frequency across different job profiles (Data Engineer, Analyst, ML Engineer, etc.).
 - **Sequential Roadmaps**: Generates logical learning paths that explain *why* tools should be learned in a specific order (e.g., Python before Airflow).
 - **Clean Data Storage**: Exports structured data to both high-performance **Parquet** files and queryable **SQLite** databases.
+- **Interactive Web Dashboard**: Features a beautiful Streamlit application with Plotly charts for dynamic exploration of job market insights and 1-click roadmap generation.
 
 ---
 
@@ -42,6 +46,7 @@ roadmap_webscraping/
 ├── scripts/            # Core Python pipeline components
 │   ├── scraper_pipeline.py    # ETL: Extract, AI-Transform, Load
 │   └── roadmap_generator.py   # Analysis & Roadmap Generation
+├── app.py              # Streamlit Web Dashboard
 ├── output/             # Generated Markdown roadmaps
 ├── .gitignore          # Environment & data exclusions
 ├── LICENSE             # MIT License
@@ -69,6 +74,8 @@ For detailed instructions on how to set up and use the project, please refer to 
 - **Data Processing**: Pandas, PyArrow
 - **Database**: SQLite3
 - **Storage**: Apache Parquet
+- **Web Frontend**: Streamlit
+- **Data Visualization**: Plotly
 
 ---
 

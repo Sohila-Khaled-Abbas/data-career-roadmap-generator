@@ -40,3 +40,18 @@ def main():
     target_profile = "Machine Learning Engineer" 
     # ...
 ```
+
+## 3. Streamlit Interactive Dashboard
+
+For a more user-friendly experience, you can use the Streamlit web application. This interface allows you to visually explore the top skills and generate roadmaps with a single click.
+
+**Execution:**
+```bash
+streamlit run app.py
+```
+
+**Features:**
+- View high-level metrics about the scraped data.
+- Select target roles dynamically from a sidebar.
+- Visualize the top 15 most requested skills via an interactive Plotly chart.
+- Generate and download Claude AI roadmaps directly from the browser.

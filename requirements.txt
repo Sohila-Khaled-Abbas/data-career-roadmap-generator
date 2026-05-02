@@ -2,3 +2,5 @@ playwright
 pandas
 requests
 pyarrow
+streamlit
+plotly
