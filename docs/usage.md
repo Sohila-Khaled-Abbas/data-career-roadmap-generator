@@ -94,3 +94,17 @@ jupyter notebook notebooks/Data_Career_Roadmap.ipynb
 - Real-time interaction with the AgentRouter Claude AI model for skill extraction.
 - Inline preview of the Pandas DataFrame.
 - Saving Parquet, SQLite, and Markdown roadmap files directly to the `output/` folder.
+
+## 7. FastAPI Backend Server
+
+A decoupled FastAPI backend has been implemented to serve the ETL data via REST APIs, paving the way for distinct web frontends (like Next.js).
+
+**Execution:**
+```bash
+uvicorn src.api.main:app --reload --port 8000
+```
+
+**Features:**
+- **Interactive API Docs:** Automatically generated Swagger UI available at `http://localhost:8000/docs`.
+- **Decoupled Architecture:** Cleanly separates the data layer (Parquet/SQLite) from the presentation layer.
+- **Robust Endpoints:** Fetch aggregated skills, market insights, and trigger Claude AI generation securely via REST calls.

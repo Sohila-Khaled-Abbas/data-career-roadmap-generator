@@ -55,7 +55,9 @@ roadmap_webscraping/
 ├── docs/               # Detailed project documentation
 ├── src/                # Core Python pipeline components
 │   ├── scraper_pipeline.py    # ETL: Extract, AI-Transform, Load
-│   └── roadmap_generator.py   # Analysis & Roadmap Generation
+│   ├── roadmap_generator.py   # Analysis & Roadmap Generation
+│   └── api/                   # REST API Layer
+│       └── main.py            # FastAPI Application
 ├── docker-compose.yml    # Docker services config
 ├── Dockerfile          # Container build instructions
 ├── automate.py         # 1-Click Pipeline Orchestrator
@@ -92,6 +94,7 @@ For detailed instructions on how to set up and use the project, please refer to 
 - **Data Processing**: Pandas, PyArrow
 - **Database**: SQLite3
 - **Storage**: Apache Parquet
+- **Backend API**: FastAPI, Uvicorn, Pydantic
 - **Web Frontend**: Streamlit
 - **Data Visualization**: Plotly
 - **Interactive Environment**: Jupyter Notebook

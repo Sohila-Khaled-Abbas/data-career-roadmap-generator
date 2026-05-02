@@ -6,3 +6,6 @@ streamlit
 plotly
 jupyter
 ipykernel
+fastapi
+uvicorn
+pydantic
