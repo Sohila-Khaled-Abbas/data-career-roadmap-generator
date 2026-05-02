@@ -1,13 +1,58 @@
 version: '3.8'
 
 services:
-  roadmap_app:
-    build: .
-    container_name: roadmap_app
-    ports:
-      - "8501:8501"
+  etl-worker:
+    build:
+      context: .
+      dockerfile: docker/etl.Dockerfile
+    container_name: etl_worker
     volumes:
-      - ./data:/app/data
-      - ./output:/app/output
+      - shared_data:/app/data
+      - shared_output:/app/output
+    networks:
+      - roadmap_net
+    profiles:
+      - etl
     environment:
       - PYTHONUNBUFFERED=1
+
+  api-backend:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    container_name: api_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - shared_data:/app/data
+      - shared_output:/app/output
+    networks:
+      - roadmap_net
+    restart: always
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  web-frontend:
+    build:
+      context: ./web
+      dockerfile: ../docker/web.Dockerfile
+    container_name: web_frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - roadmap_net
+    depends_on:
+      - api-backend
+    restart: always
+    environment:
+      - NEXT_PUBLIC_API_URL=http://api-backend:8000
+
+volumes:
+  shared_data:
+    driver: local
+  shared_output:
+    driver: local
+
+networks:
+  roadmap_net:
+    driver: bridge
