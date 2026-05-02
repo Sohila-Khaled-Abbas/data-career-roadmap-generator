@@ -3,8 +3,11 @@
 [![Python](https://img.shields.io/badge/Python-3.9+-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![Playwright](https://img.shields.io/badge/Playwright-Automated_Scraping-green?logo=playwright)](https://playwright.dev/)
 [![AgentRouter](https://img.shields.io/badge/AgentRouter-API-purple)](https://agentrouter.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Streamlit](https://img.shields.io/badge/Streamlit-Interactive_Dashboard-FF4B4B?logo=streamlit)](https://streamlit.io/)
+[![Jupyter](https://img.shields.io/badge/Jupyter-Interactive_Notebook-F37626?logo=jupyter&logoColor=white)](https://jupyter.org/)
+[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 An end-to-end data engineering pipeline that scrapes real-time job market data, extracts technical skills using Claude AI (via AgentRouter), and powers an interactive Streamlit dashboard to generate sequential learning roadmaps bridging the gap between job seekers and market demand.
 
@@ -21,7 +24,7 @@ graph TD
     classDef ui fill:#db2777,stroke:#be185d,stroke-width:2px,color:#fff,rx:8px,ry:8px
     classDef file fill:#d97706,stroke:#b45309,stroke-width:2px,color:#fff,rx:8px,ry:8px
 
-    A["Job Boards: LinkedIn, Wuzzuf"]:::scraper -->|"Playwright Scraping"| B("Raw Job Descriptions"):::scraper
+    A["Job Boards: LinkedIn, Wuzzuf, Indeed, Glassdoor"]:::scraper -->|"Playwright Scraping"| B("Raw Job Descriptions"):::scraper
     B -->|"AgentRouter API: Claude Haiku"| C{"Dynamic Skill Extraction"}:::ai
     C -->|"Structured Data"| D[("SQLite / Parquet")]:::database
     D -->|"Aggregation"| E["Top 15 In-Demand Skills"]:::database
@@ -50,7 +53,7 @@ graph TD
 roadmap_webscraping/
 ├── data/               # Persistent storage for scraped data (Parquet, SQLite)
 ├── docs/               # Detailed project documentation
-├── scripts/            # Core Python pipeline components
+├── src/                # Core Python pipeline components
 │   ├── scraper_pipeline.py    # ETL: Extract, AI-Transform, Load
 │   └── roadmap_generator.py   # Analysis & Roadmap Generation
 ├── docker-compose.yml    # Docker services config
@@ -63,6 +66,7 @@ roadmap_webscraping/
 │   └── .streamlit/config.toml
 ├── output/             # Generated Markdown roadmaps
 ├── .gitignore          # Environment & data exclusions
+├── CONTRIBUTING.md     # Guidelines for contributing
 ├── LICENSE             # MIT License
 ├── requirements.txt    # Python dependencies
 └── README.md           # Primary overview
@@ -92,6 +96,12 @@ For detailed instructions on how to set up and use the project, please refer to 
 - **Data Visualization**: Plotly
 - **Interactive Environment**: Jupyter Notebook
 - **Containerization**: Docker & Docker Compose
+
+---
+
+## Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**. Please read the [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to report bugs, suggest features, and submit Pull Requests.
 
 ---
 

@@ -5,9 +5,9 @@ import os
 import sys
 from collections import Counter
 
-# Add scripts directory to path to import roadmap generator
+# Add src directory to path to import roadmap generator
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(os.path.join(ROOT_DIR, 'scripts'))
+sys.path.append(os.path.join(ROOT_DIR, 'src'))
 from roadmap_generator import generate_roadmap_with_llm
 
 # Page Configuration

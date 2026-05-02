@@ -32,7 +32,7 @@ The scraper pipeline searches for job listings, extracts the job descriptions, a
 
 **Execution:**
 ```bash
-python scripts/scraper_pipeline.py
+python src/scraper_pipeline.py
 ```
 
 **Process:**
@@ -47,7 +47,7 @@ The roadmap generator reads the processed data, calculates frequency distributio
 
 **Execution:**
 ```bash
-python scripts/roadmap_generator.py
+python src/roadmap_generator.py
 ```
 
 **Process:**
@@ -58,7 +58,7 @@ python scripts/roadmap_generator.py
 - Saves the output as a Markdown file in the `output/` directory.
 
 **Changing Target Profiles:**
-To generate a roadmap for a different role, modify the `target_profile` variable in `scripts/roadmap_generator.py`:
+To generate a roadmap for a different role, modify the `target_profile` variable in `src/roadmap_generator.py`:
 ```python
 def main():
     target_profile = "Machine Learning Engineer" 

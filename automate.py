@@ -10,7 +10,7 @@ def run_pipeline():
     # Step 1: Run the Scraper
     print("[1/3] Running Scraper Pipeline to gather market data...")
     try:
-        subprocess.run(["python", "scripts/scraper_pipeline.py"], check=True)
+        subprocess.run(["python", "src/scraper_pipeline.py"], check=True)
         print("✅ Scraping completed successfully.\n")
     except subprocess.CalledProcessError as e:
         print(f"❌ Scraper failed with error: {e}")
@@ -19,7 +19,7 @@ def run_pipeline():
     # Step 2: Generate Default Roadmap
     print("[2/3] Generating Roadmap for default profile (Data Engineer)...")
     try:
-        subprocess.run(["python", "scripts/roadmap_generator.py"], check=True)
+        subprocess.run(["python", "src/roadmap_generator.py"], check=True)
         print("✅ Roadmap generation completed successfully.\n")
     except subprocess.CalledProcessError as e:
         print(f"❌ Roadmap generation failed with error: {e}")
