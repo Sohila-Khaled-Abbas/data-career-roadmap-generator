@@ -1,92 +1,65 @@
 import pandas as pd
-import requests
-import json
 import os
 import time
 from collections import Counter
+import google.generativeai as genai
 
-# API Key (Now loaded from Environment Variable for Security)
-API_KEY = os.getenv("OPENROUTER_API_KEY")
+# API Key loaded from Environment Variable
+API_KEY = os.getenv("GEMINI_API_KEY")
+
+if API_KEY:
+    genai.configure(api_key=API_KEY)
 
 def load_and_aggregate_skills(df, target_profile):
     """
     Calculates the most frequent skills for a specific role from the provided dataframe.
     """
-    # Filter for the requested profile
     profile_df = df[df['searched_profile'].str.lower() == target_profile.lower()]
     
     if profile_df.empty:
         return []
 
-    # Aggregate and count all skills
     all_skills = []
     for skills_string in profile_df['skills_detected']:
         if pd.notna(skills_string) and skills_string.strip():
-            # Split by comma and clean whitespace
             skills = [s.strip() for s in skills_string.split(',')]
             all_skills.extend(skills)
 
-    # Get frequency distribution
     skill_counts = Counter(all_skills)
-    
-    # Return the top 15 skills to keep the roadmap focused
     top_skills = [skill for skill, count in skill_counts.most_common(15)]
     return top_skills
 
 def generate_roadmap_with_llm(profile, skills):
     """
-    Uses the Gemini REST API to reason about skill dependencies and generate a Markdown roadmap.
+    Uses Gemini 2.0 Flash to reason about skill dependencies and generate a Markdown roadmap.
     """
-    print(f"Analyzing pedagogical dependencies for {profile} based on top skills: {skills}...")
-    
-    url = "https://openrouter.ai/api/v1/chat/completions"
-    
-    system_instruction = """
-    You are a strict, senior technical lead and mentor. 
-    Your job is to take a list of highly requested skills from the job market and arrange them into a logical, 
-    step-by-step learning roadmap. You must group them logically (e.g., Prerequisites, Core, Advanced).
-    Do not just list the tools; explain *why* they must be learned in this specific order.
-    Output the result strictly in clean Markdown format.
-    """
-    
-    user_prompt = f"Profile: {profile}\nTarget Skills based on market data: {', '.join(skills)}\n\nGenerate a sequential learning roadmap in Markdown."
+    if not API_KEY:
+        print("❌ Error: GEMINI_API_KEY is not set.")
+        return None
 
-    payload = {
-        "model": "anthropic/claude-3-haiku",
-        "messages": [
-            {"role": "system", "content": system_instruction},
-            {"role": "user", "content": user_prompt}
-        ]
-    }
+    print(f"🚀 Generating roadmap for {profile} using Gemini...")
     
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': f'Bearer {API_KEY}',
-        'HTTP-Referer': 'https://github.com/Sohila-Khaled-Abbas/data-career-roadmap-generator',
-        'X-Title': 'Data Career Roadmap Generator'
-    }
-    
-    # Implementing exponential backoff as required
-    delays = [1, 2, 4, 8, 16]
-    for attempt, delay in enumerate(delays):
-        try:
-            response = requests.post(url, headers=headers, data=json.dumps(payload))
-            response.raise_for_status()
-            result = response.json()
-            
-            # Extract text from the nested JSON response
-            text = result.get('choices', [{}])[0].get('message', {}).get('content', '')
-            if text:
-                return text
-            else:
-                raise ValueError("Empty response from API")
-                
-        except requests.exceptions.RequestException as e:
-            print(f"❌ API Attempt {attempt + 1} failed: {e}")
-            if attempt == len(delays) - 1:
-                print(f"API request failed after {len(delays)} retries.")
-                return None
-            time.sleep(delay)
+    try:
+        model = genai.GenerativeModel('gemini-2.0-flash')
+        
+        prompt = f"""
+        You are a senior technical lead and career mentor.
+        Based on market data for the profile '{profile}', the most in-demand skills are: {', '.join(skills)}.
+        
+        Generate a sequential, step-by-step learning roadmap in Markdown.
+        1. Group skills into logical phases (e.g., Fundamentals, Core Tools, Advanced).
+        2. Explain briefly why each step is important.
+        3. Keep the tone professional and encouraging.
+        
+        Output ONLY the Markdown content.
+        """
+        
+        response = model.generate_content(prompt)
+        return response.text
+        
+    except Exception as e:
+        print(f"❌ Gemini Roadmap Generation failed: {e}")
+        return None
 
 def save_markdown(content, profile):
     """Saves the LLM output to a formatted Markdown file."""
@@ -125,8 +98,7 @@ def main():
             else:
                 print(f"❌ Failed to generate roadmap for {profile}")
                 
-            # Small delay to avoid aggressive rate limiting
-            time.sleep(2)
+            time.sleep(1) # Rate limit respect
             
     except Exception as e:
         print(f"Error executing roadmap generation: {e}")

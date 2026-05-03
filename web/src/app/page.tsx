@@ -47,9 +47,10 @@ export default function Home() {
         skills: skills.map(s => s.skill)
       });
       setRoadmap(res.data.markdown);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error generating roadmap:", err);
-      alert("Failed to generate roadmap. Ensure the API is running and AgentRouter is accessible.");
+      const detail = err.response?.data?.detail || err.message;
+      alert(`Failed to generate roadmap: ${detail}\n\nPlease ensure your GEMINI_API_KEY is correct in the .env file and restart Docker.`);
     } finally {
       setLoading(false);
     }

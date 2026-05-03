@@ -13,7 +13,7 @@ services:
       - etl
     environment:
       - PYTHONUNBUFFERED=1
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
 
   api-backend:
     build:
