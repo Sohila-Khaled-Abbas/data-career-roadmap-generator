@@ -26,7 +26,7 @@ class RealJobScraper:
         self.fetcher = Fetcher()
         
     def fetch_linkedin_jobs(self, job_title, location="Egypt"):
-        print(f"🔍 [Scrapling] Fetching real LinkedIn jobs for: {job_title} in {location}")
+        print(f"[Scrapling] Fetching real LinkedIn jobs for: {job_title} in {location}")
         query = job_title.replace(' ', '%20')
         url = f"https://www.linkedin.com/jobs/search/?keywords={query}&location={location}"
         
@@ -65,7 +65,7 @@ class RealJobScraper:
                     })
             return extracted
         except Exception as e:
-            print(f"❌ Scrapling fetch failed: {e}")
+            print(f"[ERROR] Scrapling fetch failed: {e}")
             return []
 
 def extract_skills_dynamically(description_text):
@@ -89,7 +89,7 @@ def extract_skills_dynamically(description_text):
             
         return json.loads(text.strip())
     except Exception as e:
-        print(f"❌ Skill Extraction failed: {e}")
+        print(f"[ERROR] Skill Extraction failed: {e}")
         return []
 
 def process_job_data(jobs, profile):
@@ -97,7 +97,7 @@ def process_job_data(jobs, profile):
     crawl_date = datetime.now().strftime("%Y-%m-%d")
     
     for job in jobs:
-        print(f"    🧠 [Gemini Flash] Analyzing real job: {job['title']} at {job['company']}...")
+        print(f"    [Gemini Flash] Analyzing real job: {job['title']} at {job['company']}...")
         skills = extract_skills_dynamically(job['description'])
         processed_data.append({
             "crawl_date": crawl_date,
@@ -133,9 +133,9 @@ def main():
         # Also save to root for local dev
         save_to_parquet(df, "data/egypt_data_skills.parquet")
         
-        print(f"✅ Real Data ETL Pipeline Completed. Scraped {len(all_processed_jobs)} real jobs.")
+        print(f"[SUCCESS] Real Data ETL Pipeline Completed. Scraped {len(all_processed_jobs)} real jobs.")
     else:
-        print("❌ No real data extracted. Check your internet connection or LinkedIn blocking.")
+        print("[ERROR] No real data extracted. Check your internet connection or LinkedIn blocking.")
 
 if __name__ == "__main__":
     main()
