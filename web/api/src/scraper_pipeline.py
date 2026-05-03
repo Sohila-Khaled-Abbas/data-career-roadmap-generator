@@ -31,18 +31,18 @@ class RealJobScraper:
         url = f"https://www.linkedin.com/jobs/search/?keywords={query}&location={location}"
         
         try:
-            page = self.fetcher.get(url)
+            page = self.fetcher.get(url, allow_redirects=True)
             job_cards = page.css('div.base-card')
             
             extracted = []
             for card in job_cards[:5]: # Limit to top 5 per profile to save time/API calls
-                title_elem = card.css_first('.base-search-card__title')
-                company_elem = card.css_first('.base-search-card__subtitle')
-                link_elem = card.css_first('.base-card__full-link')
+                title_elems = card.css('.base-search-card__title')
+                company_elems = card.css('.base-search-card__subtitle')
+                link_elems = card.css('.base-card__full-link')
                 
-                title = title_elem.text.strip() if title_elem else ""
-                company = company_elem.text.strip() if company_elem else ""
-                job_url = link_elem.attrib.get('href', '') if link_elem else ""
+                title = title_elems[0].text.strip() if title_elems else ""
+                company = company_elems[0].text.strip() if company_elems else ""
+                job_url = link_elems[0].attrib.get('href', '') if link_elems else ""
                 
                 description = ""
                 # Fetch actual job description if link exists
@@ -50,9 +50,9 @@ class RealJobScraper:
                     try:
                         # Add a small delay to avoid rate limits
                         time.sleep(1)
-                        desc_page = self.fetcher.get(job_url)
-                        desc_elem = desc_page.css_first('.show-more-less-html__markup')
-                        description = desc_elem.text.strip() if desc_elem else f"Job Title: {title}. Company: {company}."
+                        desc_page = self.fetcher.get(job_url, allow_redirects=True)
+                        desc_elems = desc_page.css('.show-more-less-html__markup')
+                        description = desc_elems[0].text.strip() if desc_elems else f"Job Title: {title}. Company: {company}."
                     except Exception as e:
                         print(f"Failed to fetch description for {title}: {e}")
                         description = f"Job Title: {title}. Company: {company}."
