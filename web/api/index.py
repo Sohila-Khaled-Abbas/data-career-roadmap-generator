@@ -24,8 +24,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-PARQUET_PATH = os.path.join(ROOT_DIR, "data", "egypt_data_skills.parquet")
-OUTPUT_DIR = os.path.join(ROOT_DIR, "output")
+PARQUET_PATH = os.path.join(os.path.dirname(__file__), "data", "egypt_data_skills.parquet")
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
 
 class SkillFrequency(BaseModel):
     skill: str
