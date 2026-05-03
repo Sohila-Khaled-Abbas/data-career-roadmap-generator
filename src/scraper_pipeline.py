@@ -9,8 +9,8 @@ import json
 import os
 from abc import ABC, abstractmethod
 
-# OpenRouter API Key
-API_KEY = "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"
+# API Key (Now loaded from Environment Variable for Security)
+API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 if not API_KEY:
     print("WARNING: API_KEY is not set. LLM extraction will fail.")
