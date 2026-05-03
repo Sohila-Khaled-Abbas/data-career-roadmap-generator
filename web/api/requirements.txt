@@ -1,0 +1,11 @@
+playwright
+pandas
+requests
+pyarrow
+plotly
+jupyter
+ipykernel
+fastapi
+uvicorn
+pydantic
+google-generativeai
