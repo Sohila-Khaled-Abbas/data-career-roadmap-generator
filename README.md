@@ -1,16 +1,16 @@
 # Data & AI Career Roadmap Generator
 
 [![Python](https://img.shields.io/badge/Python-3.9+-blue?logo=python&logoColor=white)](https://www.python.org/)
-[![Playwright](https://img.shields.io/badge/Playwright-Automated_Scraping-green?logo=playwright)](https://playwright.dev/)
-[![AgentRouter](https://img.shields.io/badge/AgentRouter-API-purple)](https://agentrouter.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-Backend_API-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Playwright](https://img.shields.io/badge/Scrapling-Automated_Scraping-green)](https://github.com/D4Vinci/Scrapling)
+[![Gemini](https://img.shields.io/badge/Gemini-2.0_Flash-purple)](https://aistudio.google.com/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Serverless_API-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Next.js](https://img.shields.io/badge/Next.js-React_Framework-black?logo=next.js)](https://nextjs.org/)
-[![Jupyter](https://img.shields.io/badge/Jupyter-Interactive_Notebook-F37626?logo=jupyter&logoColor=white)](https://jupyter.org/)
-[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![Vercel](https://img.shields.io/badge/Vercel-Deployment-black?logo=vercel&logoColor=white)](https://vercel.com/)
+[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-Automation-2088FF?logo=github-actions&logoColor=white)](https://github.com/features/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-An end-to-end data engineering pipeline that scrapes real-time job market data, extracts technical skills using Claude AI (via AgentRouter), and powers an interactive Next.js web application to generate sequential learning roadmaps bridging the gap between job seekers and market demand.
+An end-to-end data engineering pipeline that scrapes real-time job market data, extracts technical skills using Gemini 2.0 Flash, and powers an interactive Serverless Next.js web application to generate sequential learning roadmaps bridging the gap between job seekers and market demand. Includes a GitHub Actions cron job for daily market data updates.
 
 ---
 
@@ -25,13 +25,13 @@ graph TD
     classDef ui fill:#db2777,stroke:#be185d,stroke-width:2px,color:#fff,rx:8px,ry:8px
     classDef file fill:#d97706,stroke:#b45309,stroke-width:2px,color:#fff,rx:8px,ry:8px
 
-    A["Job Boards: LinkedIn, Wuzzuf, Indeed, Glassdoor"]:::scraper -->|Playwright Scraping| B["Raw Job Descriptions"]:::scraper
-    B -->|AgentRouter API: Claude Haiku| C["Dynamic Skill Extraction"]:::ai
+    A["Job Boards: LinkedIn"]:::scraper -->|Scrapling (Stealth Fetch)| B["Real Job Descriptions"]:::scraper
+    B -->|Google GenAI API: Gemini 2.0 Flash| C["Dynamic Skill Extraction"]:::ai
     C -->|Structured Data| D["SQLite / Parquet"]:::database
     D -->|Aggregation| E["Top 15 In-Demand Skills"]:::database
     E -->|Roadmap Logic| F["Pedagogical Learning Roadmap"]:::ai
     F -->|Markdown Export| G["output/roadmap_data_engineer.md"]:::file
-    E -->|Plotly Visualizations| H["Next.js Web Frontend"]:::ui
+    E -->|Recharts Visualizations| H["Next.js Serverless Web Frontend (Vercel)"]:::ui
     F -->|Interactive UI| H
 ```
 
@@ -39,41 +39,36 @@ graph TD
 
 ## Key Features
 
-- **Multi-Source Scraping**: Utilizes Playwright to navigate complex DOM structures of major job boards (LinkedIn, Wuzzuf, Indeed, Glassdoor).
-- **AI-Powered Extraction**: Leverages `claude-haiku-4-5-20251001` through the AgentRouter API to identify technical tools and frameworks from unstructured text, avoiding brittle regex.
+- **Multi-Source Scraping**: Utilizes `scrapling` to stealthily bypass bot protections and extract real job descriptions from LinkedIn.
+- **Automated Daily Updates**: A GitHub Actions workflow automatically runs the pipeline every day at midnight (UTC) and redeploys the live Vercel app with fresh market data.
+- **AI-Powered Extraction**: Leverages `gemini-2.0-flash` through the new `google-genai` SDK to identify technical tools and frameworks from unstructured text, avoiding brittle regex.
 - **Smart Aggregation**: Ranks skills by frequency across different job profiles (Data Engineer, Analyst, ML Engineer, etc.).
 - **Sequential Roadmaps**: Generates logical learning paths that explain *why* tools should be learned in a specific order (e.g., Python before Airflow).
-- **Clean Data Storage**: Exports structured data to both high-performance **Parquet** files and queryable **SQLite** databases.
-- **Interactive Web Dashboard**: Features a beautiful Next.js application using Recharts for dynamic exploration of job market insights and 1-click roadmap generation.
+- **Vercel Serverless Architecture**: The FastAPI backend and Next.js frontend are unified in a single monorepo deployed seamlessly to Vercel.
+- **Clean Data Storage**: Exports structured data to high-performance **Parquet** files for lightning-fast serverless reads.
+- **Interactive Web Dashboard**: Features a beautiful "Glassmorphism" Next.js application using Recharts for dynamic exploration of job market insights and 1-click roadmap generation.
 
 ---
 
 ## Project Structure
 
-```text
 roadmap_webscraping/
-├── data/               # Persistent storage for scraped data (Parquet, SQLite)
+├── .github/workflows/  # CI/CD Automation
+│   └── daily_scraper.yml # Runs ETL pipeline automatically every day
+├── data/               # Persistent storage for scraped data (Parquet)
 ├── docs/               # Detailed project documentation
-├── src/                # Core Python pipeline components
-│   ├── scraper_pipeline.py    # ETL: Extract, AI-Transform, Load
-│   ├── roadmap_generator.py   # Analysis & Roadmap Generation
-│   └── api/                   # REST API Layer
-│       └── main.py            # FastAPI Application
-├── docker-compose.yml    # Docker services config
-├── Dockerfile          # Container build instructions
-├── automate.py         # 1-Click Pipeline Orchestrator
-├── docker/             # Dockerfiles for microservices
-│   ├── etl.Dockerfile
-│   ├── api.Dockerfile
-│   └── web.Dockerfile
-├── web/                # Next.js Web Frontend
-│   ├── src/app/        # React components and styling
-│   └── package.json    # Node dependencies
 ├── output/             # Generated Markdown roadmaps
+├── web/                # Vercel Monorepo Root
+│   ├── api/            # FastAPI Serverless Backend
+│   │   ├── src/        # Python Pipeline Components (Scrapling & Gemini)
+│   │   ├── index.py    # Vercel Lambda Entry Point
+│   │   └── requirements.txt
+│   ├── src/app/        # React Next.js components and styling
+│   ├── package.json    # Node dependencies
+│   └── vercel.json     # Deployment configuration and API routing
 ├── .gitignore          # Environment & data exclusions
 ├── CONTRIBUTING.md     # Guidelines for contributing
 ├── LICENSE             # MIT License
-├── requirements.txt    # Python dependencies
 └── README.md           # Primary overview
 ```
 
@@ -91,17 +86,15 @@ For detailed instructions on how to set up and use the project, please refer to 
 
 ## Technical Stack
 
-- **Orchestration**: Python
-- **Automation**: Playwright (Headless Chromium)
-- **AI/LLM Integration**: AgentRouter API (`claude-haiku-4-5-20251001`)
+- **Orchestration**: GitHub Actions (Cron)
+- **Automation**: Scrapling (Stealth Web Scraping)
+- **AI/LLM Integration**: Google GenAI SDK (`gemini-2.0-flash`)
 - **Data Processing**: Pandas, PyArrow
-- **Database**: SQLite3
 - **Storage**: Apache Parquet
-- **Backend API**: FastAPI, Uvicorn, Pydantic
-- **Web Frontend**: Next.js (React), Recharts
-- **Data Visualization**: Plotly
-- **Interactive Environment**: Jupyter Notebook
-- **Containerization**: Docker & Docker Compose
+- **Backend API**: FastAPI, Pydantic (Vercel Serverless Functions)
+- **Web Frontend**: Next.js (React), Tailwind/Vanilla CSS
+- **Data Visualization**: Recharts
+- **Hosting / Deployment**: Vercel
 
 ---
 
