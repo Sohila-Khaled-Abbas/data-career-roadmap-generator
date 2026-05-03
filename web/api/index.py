@@ -7,9 +7,9 @@ import os
 import sys
 from collections import Counter
 
-# For Vercel Serverless, we need to ensure the path includes the root
+# For Vercel Serverless, we point to our local src copy
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-sys.path.append(os.path.join(ROOT_DIR, 'src'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 from roadmap_generator import generate_roadmap_with_llm
 
