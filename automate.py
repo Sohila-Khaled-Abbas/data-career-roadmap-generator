@@ -26,11 +26,16 @@ def run_pipeline():
         return
 
     # Step 3: Launch Full Stack
-    print("[3/3] The pipeline is now decoupled.")
-    print("ℹ️ To launch the FastAPI backend and Next.js frontend, please use Docker:")
-    print("    docker-compose up --build")
-    print("    - API available at: http://localhost:8000")
-    print("    - Web App available at: http://localhost:3000")
+    print("[3/3] Connecting the pipeline to the Docker stack...")
+    try:
+        print("🚀 Starting FastAPI and Next.js containers...")
+        subprocess.run(["docker-compose", "up", "-d", "--build"], check=True)
+        print("\n✅ Full stack is now connected and running!")
+        print("   - Web App: http://localhost:3000")
+        print("   - API Docs: http://localhost:8000/docs")
+    except Exception as e:
+        print(f"❌ Failed to launch Docker containers: {e}")
+        print("ℹ️ Manual start required: docker-compose up --build")
 
 if __name__ == "__main__":
     run_pipeline()

@@ -5,8 +5,8 @@ services:
       dockerfile: docker/etl.Dockerfile
     container_name: etl_worker
     volumes:
-      - shared_data:/app/data
-      - shared_output:/app/output
+      - ./data:/app/data
+      - ./output:/app/output
     networks:
       - roadmap_net
     profiles:
@@ -22,8 +22,8 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - shared_data:/app/data
-      - shared_output:/app/output
+      - ./data:/app/data
+      - ./output:/app/output
     networks:
       - roadmap_net
     restart: always
@@ -43,13 +43,7 @@ services:
       - api-backend
     restart: always
     environment:
-      - NEXT_PUBLIC_API_URL=http://api-backend:8000
-
-volumes:
-  shared_data:
-    driver: local
-  shared_output:
-    driver: local
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
 
 networks:
   roadmap_net:
