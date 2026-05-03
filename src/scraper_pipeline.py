@@ -10,7 +10,7 @@ import os
 from abc import ABC, abstractmethod
 
 # OpenRouter API Key
-API_KEY = "sk-LbPg7LXBCBEZgBuCnDoKhkl1k6CYhOeRXODRxSwX4PkSkz6D"
+API_KEY = "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"
 
 if not API_KEY:
     print("WARNING: API_KEY is not set. LLM extraction will fail.")
@@ -105,7 +105,7 @@ def extract_skills_dynamically(description_text):
     if not API_KEY:
         return []
 
-    url = "https://agentrouter.org/v1/chat/completions"
+    url = "https://openrouter.ai/api/v1/chat/completions"
     
     system_instruction = """
     You are a data extraction bot. Your sole purpose is to read a job description and extract 
@@ -116,7 +116,7 @@ def extract_skills_dynamically(description_text):
     """
 
     payload = {
-        "model": "claude-haiku-4-5-20251001",
+        "model": "anthropic/claude-3-haiku",
         "messages": [
             {"role": "system", "content": system_instruction},
             {"role": "user", "content": description_text}
@@ -126,9 +126,8 @@ def extract_skills_dynamically(description_text):
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {API_KEY}',
-        'Originator': 'codex_cli_rs',
-        'Version': '0.101.0',
-        'User-Agent': 'codex_cli_rs/0.101.0 (Mac OS 26.0.1; arm64) Apple_Terminal/464'
+        'HTTP-Referer': 'https://github.com/Sohila-Khaled-Abbas/data-career-roadmap-generator',
+        'X-Title': 'Data Career Roadmap Generator'
     }
     
     delays = [1, 2, 4, 8, 16]

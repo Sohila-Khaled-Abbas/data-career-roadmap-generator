@@ -6,7 +6,7 @@ import time
 from collections import Counter
 
 # OpenRouter API Key
-API_KEY = "sk-LbPg7LXBCBEZgBuCnDoKhkl1k6CYhOeRXODRxSwX4PkSkz6D"
+API_KEY = "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"
 
 def load_and_aggregate_skills(df, target_profile):
     """
@@ -39,7 +39,7 @@ def generate_roadmap_with_llm(profile, skills):
     """
     print(f"Analyzing pedagogical dependencies for {profile} based on top skills: {skills}...")
     
-    url = "https://agentrouter.org/v1/chat/completions"
+    url = "https://openrouter.ai/api/v1/chat/completions"
     
     system_instruction = """
     You are a strict, senior technical lead and mentor. 
@@ -52,7 +52,7 @@ def generate_roadmap_with_llm(profile, skills):
     user_prompt = f"Profile: {profile}\nTarget Skills based on market data: {', '.join(skills)}\n\nGenerate a sequential learning roadmap in Markdown."
 
     payload = {
-        "model": "claude-haiku-4-5-20251001",
+        "model": "anthropic/claude-3-haiku",
         "messages": [
             {"role": "system", "content": system_instruction},
             {"role": "user", "content": user_prompt}
@@ -62,9 +62,8 @@ def generate_roadmap_with_llm(profile, skills):
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {API_KEY}',
-        'Originator': 'codex_cli_rs',
-        'Version': '0.101.0',
-        'User-Agent': 'codex_cli_rs/0.101.0 (Mac OS 26.0.1; arm64) Apple_Terminal/464'
+        'HTTP-Referer': 'https://github.com/Sohila-Khaled-Abbas/data-career-roadmap-generator',
+        'X-Title': 'Data Career Roadmap Generator'
     }
     
     # Implementing exponential backoff as required
