@@ -12,10 +12,21 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.append(os.path.join(ROOT_DIR, 'src'))
 from roadmap_generator import generate_roadmap_with_llm
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(
     title="Data & AI Career Roadmap API",
     description="API to serve job market insights and AI-generated learning roadmaps.",
     version="1.0.0"
+)
+
+# Enable CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Paths
