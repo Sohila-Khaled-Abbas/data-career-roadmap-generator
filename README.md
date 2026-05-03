@@ -1,12 +1,12 @@
 # Data & AI Career Roadmap Generator
 
-[![Python](https://img.shields.io/badge/Python-3.9+-blue?logo=python&logoColor=white)](https://www.python.org/)
-[![Playwright](https://img.shields.io/badge/Scrapling-Automated_Scraping-green)](https://github.com/D4Vinci/Scrapling)
-[![Gemini](https://img.shields.io/badge/Gemini-2.0_Flash-purple)](https://aistudio.google.com/)
+[![Python](https://img.shields.io/badge/Python-3.11+-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![Scrapling](https://img.shields.io/badge/Scrapling-Automated_Scraping-2ea44f?logo=python&logoColor=white)](https://github.com/D4Vinci/Scrapling)
+[![Gemini](https://img.shields.io/badge/Gemini-2.0_Flash-8E75B2?logo=googlegemini&logoColor=white)](https://aistudio.google.com/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-Serverless_API-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Next.js](https://img.shields.io/badge/Next.js-React_Framework-black?logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-React_Framework-black?logo=nextdotjs)](https://nextjs.org/)
 [![Vercel](https://img.shields.io/badge/Vercel-Deployment-black?logo=vercel&logoColor=white)](https://vercel.com/)
-[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-Automation-2088FF?logo=github-actions&logoColor=white)](https://github.com/features/actions)
+[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-Automation-2088FF?logo=githubactions&logoColor=white)](https://github.com/features/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
