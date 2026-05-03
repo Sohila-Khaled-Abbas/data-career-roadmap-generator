@@ -2,6 +2,7 @@ import pandas as pd
 import requests
 import json
 import os
+import time
 from collections import Counter
 
 # OpenRouter API Key
@@ -81,7 +82,8 @@ def generate_roadmap_with_llm(profile, skills):
             else:
                 raise ValueError("Empty response from API")
                 
-        except requests.exceptions.RequestException:
+        except requests.exceptions.RequestException as e:
+            print(f"❌ API Attempt {attempt + 1} failed: {e}")
             if attempt == len(delays) - 1:
                 print(f"API request failed after {len(delays)} retries.")
                 return None
@@ -131,5 +133,4 @@ def main():
         print(f"Error executing roadmap generation: {e}")
 
 if __name__ == "__main__":
-    import time # needed for the backoff retry logic and delays
-    main()
+    main()
