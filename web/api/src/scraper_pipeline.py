@@ -5,14 +5,13 @@ from datetime import datetime
 import time
 import os
 import json
-import google.generativeai as genai
+from google import genai
 from scrapling import Fetcher
 
 # API Key loaded from Environment Variable
 API_KEY = os.getenv("GEMINI_API_KEY")
 
-if API_KEY:
-    genai.configure(api_key=API_KEY)
+client = genai.Client(api_key=API_KEY) if API_KEY else None
 
 # Target profiles
 TARGET_PROFILES = [
@@ -41,7 +40,16 @@ class RealJobScraper:
                 link_elems = card.css('.base-card__full-link')
                 
                 title = title_elems[0].text.strip() if title_elems else ""
-                company = company_elems[0].text.strip() if company_elems else ""
+                
+                company = ""
+                if company_elems:
+                    company_links = company_elems[0].css('a')
+                    if company_links and company_links[0].text.strip():
+                        company = company_links[0].text.strip()
+                    else:
+                        # Fallback if no anchor tag
+                        company = company_elems[0].text.strip()
+                
                 job_url = link_elems[0].attrib.get('href', '') if link_elems else ""
                 
                 description = ""
@@ -57,10 +65,10 @@ class RealJobScraper:
                         print(f"Failed to fetch description for {title}: {e}")
                         description = f"Job Title: {title}. Company: {company}."
 
-                if title and company:
+                if title:
                     extracted.append({
                         "title": title,
-                        "company": company,
+                        "company": company if company else "Unknown Company",
                         "description": description
                     })
             return extracted
@@ -76,10 +84,12 @@ def extract_skills_dynamically(description_text):
         return []
 
     try:
-        model = genai.GenerativeModel('gemini-2.0-flash')
         prompt = f"Extract ONLY technical tools, programming languages, and frameworks from this real job description as a JSON list of strings (no other text). Description: {description_text[:2000]}"
         
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model='gemini-2.0-flash',
+            contents=prompt
+        )
         text = response.text.strip()
         
         if "```json" in text:

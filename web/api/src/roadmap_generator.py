@@ -2,13 +2,12 @@ import pandas as pd
 import os
 import time
 from collections import Counter
-import google.generativeai as genai
+from google import genai
 
 # API Key loaded from Environment Variable
 API_KEY = os.getenv("GEMINI_API_KEY")
 
-if API_KEY:
-    genai.configure(api_key=API_KEY)
+client = genai.Client(api_key=API_KEY) if API_KEY else None
 
 def load_and_aggregate_skills(df, target_profile):
     """
@@ -40,8 +39,6 @@ def generate_roadmap_with_llm(profile, skills):
     print(f"🚀 Generating roadmap for {profile} using Gemini...")
     
     try:
-        model = genai.GenerativeModel('gemini-2.0-flash')
-        
         prompt = f"""
         You are a senior technical lead and career mentor.
         Based on market data for the profile '{profile}', the most in-demand skills are: {', '.join(skills)}.
@@ -54,7 +51,10 @@ def generate_roadmap_with_llm(profile, skills):
         Output ONLY the Markdown content.
         """
         
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model='gemini-2.0-flash',
+            contents=prompt
+        )
         return response.text
         
     except Exception as e:
