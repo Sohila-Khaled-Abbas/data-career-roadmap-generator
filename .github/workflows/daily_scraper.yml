@@ -1,0 +1,39 @@
+name: Daily Job Market Scraper
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs at 00:00 UTC every day
+  workflow_dispatch: # Allows manual triggering from the GitHub Actions tab
+
+jobs:
+  scrape-and-update:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas pyarrow google-generativeai scrapling
+
+      - name: Run Scraper Pipeline
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python web/api/src/scraper_pipeline.py
+
+      - name: Commit and Push Updated Data
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add data/egypt_data_skills.parquet
+          git add web/api/data/egypt_data_skills.parquet
+          git commit -m "Automated daily update of real job market data" || echo "No changes to commit"
+          git push
