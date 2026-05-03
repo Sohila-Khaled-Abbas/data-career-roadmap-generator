@@ -24,10 +24,19 @@ export default function Home() {
 
   useEffect(() => {
     if (!selectedProfile) return;
+    
     // Fetch top skills
     axios.get(`${API_BASE}/skills/${selectedProfile}/top?limit=15`).then(res => {
       setSkills(res.data);
     }).catch(err => console.error("Error fetching skills:", err));
+
+    // Try to fetch pre-generated roadmap
+    axios.get(`${API_BASE}/roadmaps/${selectedProfile}`).then(res => {
+      setRoadmap(res.data.markdown);
+    }).catch(err => {
+      console.log("No saved roadmap found for this profile.");
+      setRoadmap('');
+    });
   }, [selectedProfile]);
 
   const generateRoadmap = async () => {

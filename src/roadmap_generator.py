@@ -7,20 +7,15 @@ from collections import Counter
 # OpenRouter API Key
 API_KEY = "sk-LbPg7LXBCBEZgBuCnDoKhkl1k6CYhOeRXODRxSwX4PkSkz6D"
 
-def load_and_aggregate_skills(parquet_file, target_profile):
+def load_and_aggregate_skills(df, target_profile):
     """
-    Reads the ETL output and calculates the most frequent skills for a specific role.
+    Calculates the most frequent skills for a specific role from the provided dataframe.
     """
-    if not os.path.exists(parquet_file):
-        raise FileNotFoundError(f"Pipeline output {parquet_file} not found. Run the ETL script first.")
-
-    df = pd.read_parquet(parquet_file)
-    
     # Filter for the requested profile
     profile_df = df[df['searched_profile'].str.lower() == target_profile.lower()]
     
     if profile_df.empty:
-        raise ValueError(f"No data found for profile: {target_profile}")
+        return []
 
     # Aggregate and count all skills
     all_skills = []
@@ -94,27 +89,47 @@ def generate_roadmap_with_llm(profile, skills):
 
 def save_markdown(content, profile):
     """Saves the LLM output to a formatted Markdown file."""
+    if not os.path.exists('output'):
+        os.makedirs('output')
     filename = f"output/roadmap_{profile.replace(' ', '_').lower()}.md"
     with open(filename, 'w', encoding='utf-8') as f:
         f.write(content)
-    print(f"Roadmap successfully generated and saved to: {filename}")
+    print(f"✅ Roadmap successfully generated and saved to: {filename}")
 
 def main():
-    target_profile = "Data Engineer" # Change this to test other profiles
     parquet_source = "data/egypt_data_skills.parquet"
     
+    if not os.path.exists(parquet_source):
+        print(f"❌ Pipeline output {parquet_source} not found. Run the ETL script first.")
+        return
+
     try:
-        top_skills = load_and_aggregate_skills(parquet_source, target_profile)
-        print(f"Top market skills identified: {top_skills}")
+        df = pd.read_parquet(parquet_source)
+        profiles = df['searched_profile'].unique()
         
-        roadmap_md = generate_roadmap_with_llm(target_profile, top_skills)
+        print(f"🔍 Found {len(profiles)} unique job profiles in data.")
         
-        if roadmap_md:
-            save_markdown(roadmap_md, target_profile)
+        for profile in profiles:
+            print(f"\n🚀 Processing roadmap for: {profile}...")
+            
+            top_skills = load_and_aggregate_skills(df, profile)
+            if not top_skills:
+                print(f"⚠️ No skills identified for {profile}, skipping.")
+                continue
+                
+            roadmap_md = generate_roadmap_with_llm(profile, top_skills)
+            
+            if roadmap_md:
+                save_markdown(roadmap_md, profile)
+            else:
+                print(f"❌ Failed to generate roadmap for {profile}")
+                
+            # Small delay to avoid aggressive rate limiting
+            time.sleep(2)
             
     except Exception as e:
         print(f"Error executing roadmap generation: {e}")
 
 if __name__ == "__main__":
-    import time # needed for the backoff retry logic
-    main()
+    import time # needed for the backoff retry logic and delays
+    main()

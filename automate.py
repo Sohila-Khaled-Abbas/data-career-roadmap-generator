@@ -16,11 +16,11 @@ def run_pipeline():
         print(f"❌ Scraper failed with error: {e}")
         return
 
-    # Step 2: Generate Default Roadmap
-    print("[2/3] Generating Roadmap for default profile (Data Engineer)...")
+    # Step 2: Generate Roadmaps for all profiles
+    print("[2/3] Generating individual roadmaps for each identified job profile...")
     try:
         subprocess.run(["python", "src/roadmap_generator.py"], check=True)
-        print("✅ Roadmap generation completed successfully.\n")
+        print("✅ All roadmaps generated successfully.\n")
     except subprocess.CalledProcessError as e:
         print(f"❌ Roadmap generation failed with error: {e}")
         return
