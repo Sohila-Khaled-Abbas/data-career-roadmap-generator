@@ -16,7 +16,10 @@ client = genai.Client(api_key=API_KEY) if API_KEY else None
 # Target profiles
 TARGET_PROFILES = [
     "Data Analyst", "Data Engineer", "Analytics Engineer",
-    "Data Scientist", "Machine Learning Engineer"
+    "Data Scientist", "Machine Learning Engineer",
+    "BI Developer", "Product Analyst", "Real Time Analyst",
+    "WFM Analyst", "Data Architect", "MLOps Engineer",
+    "NLP Engineer", "Computer Vision Engineer"
 ]
 
 class RealJobScraper:
@@ -76,6 +79,49 @@ class RealJobScraper:
             print(f"[ERROR] Scrapling fetch failed: {e}")
             return []
 
+    def fetch_wuzzuf_jobs(self, job_title, location="Egypt"):
+        print(f"[Scrapling] Fetching real Wuzzuf jobs for: {job_title} in {location}")
+        query = job_title.replace(' ', '+')
+        url = f"https://wuzzuf.net/search/jobs/?q={query}&a=hpb"
+        
+        try:
+            page = self.fetcher.get(url, allow_redirects=True)
+            job_cards = page.css('div.css-pkv5jc')
+            
+            extracted = []
+            for card in job_cards[:5]:
+                title_elems = card.css('h2 a')
+                company_elems = card.css('.css-d7j1kk a')
+                
+                title = title_elems[0].text.strip() if title_elems else ""
+                company = company_elems[0].text.strip().replace('-', '').strip() if company_elems else ""
+                job_url = title_elems[0].attrib.get('href', '') if title_elems else ""
+                
+                if job_url and not job_url.startswith("http"):
+                    job_url = "https://wuzzuf.net" + job_url
+                
+                description = ""
+                if job_url:
+                    try:
+                        time.sleep(1)
+                        desc_page = self.fetcher.get(job_url, allow_redirects=True)
+                        desc_elems = desc_page.css('body')
+                        description = desc_elems[0].text.strip() if desc_elems else f"Job Title: {title}. Company: {company}."
+                    except Exception as e:
+                        print(f"Failed to fetch description for {title}: {e}")
+                        description = f"Job Title: {title}. Company: {company}."
+
+                if title:
+                    extracted.append({
+                        "title": title,
+                        "company": company if company else "Unknown Company",
+                        "description": description
+                    })
+            return extracted
+        except Exception as e:
+            print(f"[ERROR] Scrapling Wuzzuf fetch failed: {e}")
+            return []
+
 def extract_skills_dynamically(description_text):
     """
     Uses Gemini 2.0 Flash to extract technical skills from REAL job descriptions.
@@ -131,8 +177,16 @@ def main():
     
     for profile in TARGET_PROFILES:
         raw_jobs = scraper.fetch_linkedin_jobs(profile, location="Egypt")
+        wuzzuf_jobs = scraper.fetch_wuzzuf_jobs(profile, location="Egypt")
+        
+        combined_jobs = []
         if raw_jobs:
-            processed = process_job_data(raw_jobs, profile)
+            combined_jobs.extend(raw_jobs)
+        if wuzzuf_jobs:
+            combined_jobs.extend(wuzzuf_jobs)
+            
+        if combined_jobs:
+            processed = process_job_data(combined_jobs, profile)
             all_processed_jobs.extend(processed)
             
     if all_processed_jobs:
