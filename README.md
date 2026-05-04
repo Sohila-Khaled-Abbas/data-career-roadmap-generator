@@ -60,20 +60,22 @@ graph TD
 
 ```text
 roadmap_webscraping/
-├── .github/workflows/  # CI/CD Automation (Daily Scraper)
-├── .env                # Local environment variables (API Keys)
-├── data/               # Local data storage (SQLite & Parquet)
-├── docs/               # Detailed documentation & setup guides
-├── output/             # Generated Markdown roadmaps
-├── web/                # Vercel Monorepo Root
-│   ├── api/            # FastAPI Serverless Backend
-│   │   ├── src/        # Scraper Pipeline & Roadmap Logic
-│   │   ├── data/       # Production data files (committed by CI)
-│   │   └── index.py    # API Lambda entry point
-│   └── src/app/        # React Next.js Frontend
-├── requirements.txt    # Base python dependencies
-├── vercel.json         # Deployment & routing config
-└── README.md           # This file
+├── .github/workflows/    # CI/CD (Daily Automated Scraper)
+├── .env                  # API Keys (Gemini)
+├── docs/                 # System documentation & guides
+├── output/               # Generated Markdown roadmaps
+├── docker/               # Containerization configurations
+├── web/                  # Vercel Monorepo Root
+│   ├── api/              # FastAPI Serverless Backend
+│   │   ├── src/          # Python Scraper & Roadmap Logic
+│   │   ├── data/         # SQLite & Parquet Market Data
+│   │   ├── index.py      # Vercel Entry Point
+│   │   └── requirements.txt
+│   ├── src/app/          # Next.js 14 Frontend (App Router)
+│   ├── public/           # Static assets
+│   └── package.json      # Node.js dependencies
+├── docker-compose.yml    # Local orchestration
+└── README.md             # Project overview
 ```
 
 ---
