@@ -278,15 +278,18 @@ class RealJobScraper:
 
 # ── Gemini Skill Extraction ────────────────────────────────────────────────
 def extract_skills_dynamically(description_text: str) -> list:
-    """Use Gemini 2.0 Flash to extract technical skills from a job description."""
+    """Analyze job description and extract technical skills and related tools using Gemini 2.0 Flash."""
     if not description_text.strip():
         return []
     try:
         prompt = (
-            "Extract ONLY technical tools, programming languages, libraries, "
-            "platforms, and frameworks from this job description. "
-            "Return a JSON array of lowercase strings ONLY — no explanation, no markdown. "
-            f"Description: {description_text[:2500]}"
+            "Analyze the following job description as a technical expert. "
+            "Identify and extract all technical skills, programming languages, tools, frameworks, and libraries mentioned. "
+            "Also, identify the core technical competencies and related technologies that are essential for the role "
+            "based on the context of the description. "
+            "Return the results as a flat JSON array of lowercase strings only. "
+            "Do not include soft skills like 'communication' or 'teamwork' unless they are technical in nature. "
+            f"Description: {description_text[:3000]}"
         )
         response = client.models.generate_content(
             model="gemini-2.0-flash",

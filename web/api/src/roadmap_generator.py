@@ -51,15 +51,20 @@ def generate_roadmap_with_llm(profile, skills):
     
     try:
         prompt = f"""
-        You are a senior technical lead and career mentor.
-        Based on market data for the profile '{profile}', the most in-demand skills are: {', '.join(skills)}.
+        You are a world-class technical mentor and career architect. 
+        Analyze the current job market demand for the '{profile}' role based on these high-frequency skills: {', '.join(skills)}.
         
-        Generate a sequential, step-by-step learning roadmap in Markdown.
-        1. Group skills into logical phases (e.g., Fundamentals, Core Tools, Advanced).
-        2. Explain briefly why each step is important.
-        3. Keep the tone professional and encouraging.
+        Your task is to create a comprehensive, sequential learning roadmap in Markdown. 
+        1. Analyze the dependencies between these tools to determine a logical learning order (e.g., learn Python foundations before Airflow).
+        2. Identify essential 'missing links'—foundational concepts or related tools not explicitly listed but required to master the primary skills.
+        3. Structure the roadmap into professional phases:
+           - Phase 1: Foundations (The 'Must-Haves')
+           - Phase 2: Core Technical Stack (Market Standards)
+           - Phase 3: Advanced Ecosystems & Orchestration
+           - Phase 4: Integration & Real-World Portfolio
+        4. Explain why each skill is prioritized based on the current market trends for {profile}.
         
-        Output ONLY the Markdown content.
+        Output only the Markdown content. Keep the tone professional, encouraging, and data-driven.
         """
         
         response = client.models.generate_content(
