@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import sqlite3
 import time
 from collections import Counter
 from google import genai
@@ -77,38 +78,51 @@ def save_markdown(content, profile):
         f.write(content)
     print(f"✅ Roadmap successfully generated and saved to: {filename}")
 
+def load_data(db_path="data/egypt_data_skills.db", parquet_path="data/egypt_data_skills.parquet"):
+    """Load job skills data from SQLite DB with Parquet as fallback."""
+    if os.path.exists(db_path):
+        try:
+            con = sqlite3.connect(db_path)
+            df  = pd.read_sql("SELECT * FROM job_skills", con)
+            con.close()
+            print(f"Loaded {len(df)} records from SQLite: {db_path}")
+            return df
+        except Exception as e:
+            print(f"SQLite load failed ({e}), falling back to Parquet")
+    if os.path.exists(parquet_path):
+        df = pd.read_parquet(parquet_path)
+        print(f"Loaded {len(df)} records from Parquet: {parquet_path}")
+        return df
+    return None
+
 def main():
-    parquet_source = "data/egypt_data_skills.parquet"
+    db_path      = "data/egypt_data_skills.db"
+    parquet_path = "data/egypt_data_skills.parquet"
     
-    if not os.path.exists(parquet_source):
-        print(f"❌ Pipeline output {parquet_source} not found. Run the ETL script first.")
+    df = load_data(db_path, parquet_path)
+    if df is None:
+        print(f"No data found. Run scraper_pipeline.py first.")
         return
 
-    try:
-        df = pd.read_parquet(parquet_source)
-        profiles = df['searched_profile'].unique()
+    profiles = df["searched_profile"].unique()
+    print(f"Found {len(profiles)} unique job profiles in data.")
+    
+    for profile in profiles:
+        print(f"\nProcessing roadmap for: {profile}...")
         
-        print(f"🔍 Found {len(profiles)} unique job profiles in data.")
+        top_skills = load_and_aggregate_skills(df, profile)
+        if not top_skills:
+            print(f"No skills identified for {profile}, skipping.")
+            continue
+            
+        roadmap_md = generate_roadmap_with_llm(profile, top_skills)
         
-        for profile in profiles:
-            print(f"\n🚀 Processing roadmap for: {profile}...")
+        if roadmap_md:
+            save_markdown(roadmap_md, profile)
+        else:
+            print(f"Failed to generate roadmap for {profile}")
             
-            top_skills = load_and_aggregate_skills(df, profile)
-            if not top_skills:
-                print(f"⚠️ No skills identified for {profile}, skipping.")
-                continue
-                
-            roadmap_md = generate_roadmap_with_llm(profile, top_skills)
-            
-            if roadmap_md:
-                save_markdown(roadmap_md, profile)
-            else:
-                print(f"❌ Failed to generate roadmap for {profile}")
-                
-            time.sleep(1) # Rate limit respect
-            
-    except Exception as e:
-        print(f"Error executing roadmap generation: {e}")
+        time.sleep(1)
 
 if __name__ == "__main__":
     main()
