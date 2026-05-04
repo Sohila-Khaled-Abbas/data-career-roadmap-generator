@@ -59,6 +59,7 @@ class RealJobScraper:
         url = f"https://www.linkedin.com/jobs/search/?keywords={query}&location={location}"
         try:
             page = self.fetcher.get(url, allow_redirects=True)
+            print(f"    [LinkedIn] Status: {page.status}")
             cards = page.css("div.base-card")
             return self._parse_linkedin_cards(cards, limit=4)
         except Exception as e:
@@ -99,7 +100,10 @@ class RealJobScraper:
             time.sleep(1.2)
             p = self.fetcher.get(url, allow_redirects=True)
             el = p.css(".show-more-less-html__markup")
-            return el[0].text.strip() if el else f"Job Title: {title}. Company: {company}."
+            desc = el[0].text.strip() if el else ""
+            if not desc or len(desc) < 10:
+                return f"Job Title: {title}. Company: {company}."
+            return desc
         except Exception:
             return f"Job Title: {title}. Company: {company}."
 
@@ -110,6 +114,7 @@ class RealJobScraper:
         url = f"https://wuzzuf.net/search/jobs/?q={query}&a=hpb"
         try:
             page  = self.fetcher.get(url, allow_redirects=True)
+            print(f"    [Wuzzuf] Status: {page.status}")
             cards = page.css("div.css-pkv5jc")
             extracted = []
             for card in cards[:4]:
@@ -147,7 +152,9 @@ class RealJobScraper:
             # Wuzzuf renders description text in multiple paragraphs inside the card
             paras = p.css(".css-o1vzmt, .css-4c4ojb, .css-0, article p")
             text  = " ".join(e.text.strip() for e in paras if e.text.strip())
-            return text if text else f"Job Title: {title}. Company: {company}."
+            if not text or len(text) < 10:
+                return f"Job Title: {title}. Company: {company}."
+            return text
         except Exception:
             return f"Job Title: {title}. Company: {company}."
 
@@ -158,6 +165,7 @@ class RealJobScraper:
         url = f"https://eg.indeed.com/jobs?q={query}&l={quote_plus(location)}"
         try:
             page  = self.fetcher.get(url, allow_redirects=True)
+            print(f"    [Indeed] Status: {page.status}")
             cards = page.css(".job_seen_beacon, .resultContent")
             extracted = []
             for card in cards[:4]:
@@ -228,6 +236,7 @@ class RealJobScraper:
         url  = f"https://www.bayt.com/en/{location}/jobs/{slug}/"
         try:
             page  = self.fetcher.get(url, allow_redirects=True)
+            print(f"    [Bayt]   Status: {page.status}")
             # Bayt lists job hrefs as /en/egypt/jobs/<slug>-<id>/
             seen  = set()
             links = []
@@ -291,18 +300,30 @@ def extract_skills_dynamically(description_text: str) -> list:
             "Do not include soft skills like 'communication' or 'teamwork' unless they are technical in nature. "
             f"Description: {description_text[:3000]}"
         )
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt,
-        )
-        text = response.text.strip()
-        if "```json" in text:
-            text = text.split("```json")[1].split("```")[0]
-        elif "```" in text:
-            text = text.split("```")[1].split("```")[0]
-        skills = json.loads(text.strip())
-        # Deduplicate + lowercase
-        return list(dict.fromkeys(s.lower().strip() for s in skills if s.strip()))
+        for attempt in range(5):
+            try:
+                response = client.models.generate_content(
+                    model="gemini-2.0-flash",
+                    contents=prompt,
+                )
+                text = response.text.strip()
+                
+                if "```json" in text:
+                    text = text.split("```json")[1].split("```")[0]
+                elif "```" in text:
+                    text = text.split("```")[1].split("```")[0]
+                
+                skills = json.loads(text.strip())
+                return list(dict.fromkeys(s.lower().strip() for s in skills if s.strip()))
+            except Exception as e:
+                if "429" in str(e):
+                    wait_time = (attempt + 1) * 20
+                    print(f"    [WAIT] Rate limit hit, waiting {wait_time}s... (Attempt {attempt+1}/5)")
+                    time.sleep(wait_time)
+                else:
+                    raise e
+
+        return []
     except Exception as e:
         print(f"    [WARN] Skill extraction failed: {e}")
         return []
@@ -315,6 +336,10 @@ def process_job_data(jobs: list, profile: str) -> list:
     for job in jobs:
         print(f"    [Gemini] {job['title']} @ {job['company']} ({job['source']})")
         skills = extract_skills_dynamically(job["description"])
+        
+        # Respect Gemini Free Tier RPM (15 RPM -> 4s between requests)
+        time.sleep(5)
+
         records.append({
             "crawl_date":       crawl_date,
             "searched_profile": profile,
