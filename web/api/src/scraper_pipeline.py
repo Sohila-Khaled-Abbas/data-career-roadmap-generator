@@ -230,12 +230,9 @@ class RealJobScraper:
             links = []
             for a in page.css("a"):
                 href = a.attrib.get("href", "")
-                if (href.startswith("/en/egypt/jobs/") or href.startswith("/en/egypt/jobs/")
-                        and "-" in href and href not in seen
-                        and not href.endswith("-jobs/")):
-                    # Skip filter/sort links
-                    if any(x in href for x in ["?options", "/jobs-in-", "-jobs/"]):
-                        continue
+                # Only individual job posting pages: /en/egypt/jobs/<job-slug>-<numeric-id>/
+                if (re.match(r"/en/egypt/jobs/[^/]+-\d+/$", href)
+                        and href not in seen):
                     seen.add(href)
                     links.append(href)
 
