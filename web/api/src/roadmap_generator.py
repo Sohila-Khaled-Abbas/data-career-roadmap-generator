@@ -3,11 +3,18 @@ import os
 import time
 from collections import Counter
 from google import genai
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 # API Key loaded from Environment Variable
 API_KEY = os.getenv("GEMINI_API_KEY")
+if not API_KEY:
+    raise ValueError("❌ CRITICAL ERROR: GEMINI_API_KEY environment variable is not set! Roadmap generation cannot proceed.")
 
-client = genai.Client(api_key=API_KEY) if API_KEY else None
+client = genai.Client(api_key=API_KEY)
 
 def load_and_aggregate_skills(df, target_profile):
     """

@@ -7,11 +7,18 @@ import os
 import json
 from google import genai
 from scrapling import Fetcher
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 # API Key loaded from Environment Variable
 API_KEY = os.getenv("GEMINI_API_KEY")
+if not API_KEY:
+    raise ValueError("❌ CRITICAL ERROR: GEMINI_API_KEY environment variable is not set! The pipeline cannot extract skills without it.")
 
-client = genai.Client(api_key=API_KEY) if API_KEY else None
+client = genai.Client(api_key=API_KEY)
 
 # Target profiles
 TARGET_PROFILES = [
