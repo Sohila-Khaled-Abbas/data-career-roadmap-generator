@@ -19,8 +19,11 @@ from google import genai
 from scrapling import Fetcher
 
 try:
-    from dotenv import load_dotenv
-    load_dotenv()
+    from dotenv import load_dotenv, find_dotenv
+    # Search upward from this script file, not from CWD
+    _env_path = find_dotenv(usecwd=False)
+    if _env_path:
+        load_dotenv(_env_path)
 except ImportError:
     pass
 
