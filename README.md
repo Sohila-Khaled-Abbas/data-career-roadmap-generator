@@ -10,7 +10,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-An end-to-end data engineering pipeline that scrapes real-time job market data, extracts technical skills using Gemini 2.0 Flash, and powers an interactive Serverless Next.js web application to generate sequential learning roadmaps bridging the gap between job seekers and market demand. Includes a GitHub Actions cron job for daily market data updates.
+An end-to-end data engineering pipeline that scrapes real-time job market data across multiple platforms, extracts technical skills using Gemini 2.0 Flash, and powers an interactive Serverless Next.js web application to generate sequential learning roadmaps. Includes a GitHub Actions cron job for daily market data updates across 15+ job profiles.
 
 ---
 
@@ -25,82 +25,84 @@ graph TD
     classDef ui fill:#db2777,stroke:#be185d,stroke-width:2px,color:#fff,rx:8px,ry:8px
     classDef file fill:#d97706,stroke:#b45309,stroke-width:2px,color:#fff,rx:8px,ry:8px
 
-    A["Job Boards: LinkedIn"]:::scraper -->|Scrapling (Stealth Fetch)| B["Real Job Descriptions"]:::scraper
-    B -->|Google GenAI API: Gemini 2.0 Flash| C["Dynamic Skill Extraction"]:::ai
-    C -->|Structured Data| D["SQLite / Parquet"]:::database
-    D -->|Aggregation| E["Top 15 In-Demand Skills"]:::database
-    E -->|Roadmap Logic| F["Pedagogical Learning Roadmap"]:::ai
-    F -->|Markdown Export| G["output/roadmap_data_engineer.md"]:::file
-    E -->|Recharts Visualizations| H["Next.js Serverless Web Frontend (Vercel)"]:::ui
-    F -->|Interactive UI| H
+    subgraph "Scraping Engine (Scrapling)"
+        A1["LinkedIn"]:::scraper
+        A2["Wuzzuf"]:::scraper
+        A3["Indeed (EG)"]:::scraper
+        A4["Bayt.com"]:::scraper
+    end
+
+    A1 & A2 & A3 & A4 -->|Stealth Fetch| B["Real Job Descriptions"]:::scraper
+    B -->|Gemini 2.0 Flash: Deep Skill Analysis| C["Dynamic Skill Extraction"]:::ai
+    C -->|Structured Data| D["SQLite (.db) & Parquet"]:::database
+    D -->|Aggregation| E["Top Skills per Profile"]:::database
+    E -->|Intelligent Roadmap Logic| F["Pedagogical Learning Roadmap"]:::ai
+    F -->|Markdown Export| G["output/roadmap_*.md"]:::file
+    D -->|Vercel API| H["Next.js Web Frontend"]:::ui
 ```
 
 ---
 
 ## Key Features
 
-- **Multi-Source Scraping**: Utilizes `scrapling` to stealthily bypass bot protections and extract real job descriptions from LinkedIn.
-- **Automated Daily Updates**: A GitHub Actions workflow automatically runs the pipeline every day at midnight (UTC) and redeploys the live Vercel app with fresh market data.
-- **AI-Powered Extraction**: Leverages `gemini-2.0-flash` through the new `google-genai` SDK to identify technical tools and frameworks from unstructured text, avoiding brittle regex.
-- **Smart Aggregation**: Ranks skills by frequency across different job profiles (Data Engineer, Analyst, ML Engineer, etc.).
-- **Sequential Roadmaps**: Generates logical learning paths that explain *why* tools should be learned in a specific order (e.g., Python before Airflow).
-- **Vercel Serverless Architecture**: The FastAPI backend and Next.js frontend are unified in a single monorepo deployed seamlessly to Vercel.
-- **Clean Data Storage**: Exports structured data to high-performance **Parquet** files for lightning-fast serverless reads.
-- **Interactive Web Dashboard**: Features a beautiful "Glassmorphism" Next.js application using Recharts for dynamic exploration of job market insights and 1-click roadmap generation.
+- **Multi-Source Aggregation**: Scrapes and merges data from **LinkedIn, Wuzzuf, Indeed, and Bayt.com** to provide a comprehensive view of the Middle East and global data markets.
+- **15+ Specialized Profiles**: Tracks demand for roles from Data Analyst and BI Developer to MLOps, NLP, and Computer Vision Engineers.
+- **Deep AI Analysis**: Leverages `gemini-2.0-flash` with context-aware prompts to extract not just keywords, but essential technical concepts and related technologies.
+- **Intelligent Roadmaps**: Generates sequential learning paths that identify "missing links" (prerequisite tools) and explain the logical dependency between technologies (e.g., Python → Airflow).
+- **Dual-Storage Engine**: Uses **SQLite** for complex relational queries and **Apache Parquet** for high-performance serverless reads.
+- **Automated Daily Pipeline**: GitHub Actions orchestrates the entire ETL process every midnight, committing fresh data and keeping the live dashboard up-to-date.
+- **Serverless API**: A unified FastAPI backend deployed as Vercel Functions, serving both pre-aggregated insights and real-time AI roadmap generation.
+- **Modern Web Dashboard**: An interactive Next.js application featuring glassmorphism design, Recharts visualizations, and 1-click personalized roadmaps.
 
 ---
 
 ## Project Structure
 
+```text
 roadmap_webscraping/
-├── .github/workflows/  # CI/CD Automation
-│   └── daily_scraper.yml # Runs ETL pipeline automatically every day
-├── data/               # Persistent storage for scraped data (Parquet)
-├── docs/               # Detailed project documentation
+├── .github/workflows/  # CI/CD Automation (Daily Scraper)
+├── .env                # Local environment variables (API Keys)
+├── data/               # Local data storage (SQLite & Parquet)
+├── docs/               # Detailed documentation & setup guides
 ├── output/             # Generated Markdown roadmaps
 ├── web/                # Vercel Monorepo Root
 │   ├── api/            # FastAPI Serverless Backend
-│   │   ├── src/        # Python Pipeline Components (Scrapling & Gemini)
-│   │   ├── index.py    # Vercel Lambda Entry Point
-│   │   └── requirements.txt
-│   ├── src/app/        # React Next.js components and styling
-│   ├── package.json    # Node dependencies
-│   └── vercel.json     # Deployment configuration and API routing
-├── .gitignore          # Environment & data exclusions
-├── CONTRIBUTING.md     # Guidelines for contributing
-├── LICENSE             # MIT License
-└── README.md           # Primary overview
+│   │   ├── src/        # Scraper Pipeline & Roadmap Logic
+│   │   ├── data/       # Production data files (committed by CI)
+│   │   └── index.py    # API Lambda entry point
+│   └── src/app/        # React Next.js Frontend
+├── requirements.txt    # Base python dependencies
+├── vercel.json         # Deployment & routing config
+└── README.md           # This file
 ```
-
----
-
-## Documentation
-
-For detailed instructions on how to set up and use the project, please refer to the documentation:
-
-- [Setup Guide](docs/setup.md): Instructions for installation, dependencies, and API configuration.
-- [Usage Guide](docs/usage.md): Step-by-step guide on running the pipelines.
-- [Architecture Details](docs/architecture.md): Deep dive into the pipeline logic and design decisions.
 
 ---
 
 ## Technical Stack
 
 - **Orchestration**: GitHub Actions (Cron)
-- **Automation**: Scrapling (Stealth Web Scraping)
-- **AI/LLM Integration**: Google GenAI SDK (`gemini-2.0-flash`)
-- **Data Processing**: Pandas, PyArrow
-- **Storage**: Apache Parquet
-- **Backend API**: FastAPI, Pydantic (Vercel Serverless Functions)
-- **Web Frontend**: Next.js (React), Tailwind/Vanilla CSS
-- **Data Visualization**: Recharts
-- **Hosting / Deployment**: Vercel
+- **Scraping Engine**: Scrapling (Stealth Fetching, curl_cffi, browserforge)
+- **AI/LLM**: Google GenAI SDK (`gemini-2.0-flash`)
+- **Data Engineering**: Pandas, PyArrow, SQLite
+- **Environment**: python-dotenv
+- **Backend API**: FastAPI, Pydantic (Vercel Serverless)
+- **Web Frontend**: Next.js (React), Vanilla CSS
+- **Visualization**: Recharts
+- **Hosting**: Vercel
+
+---
+
+## Documentation
+
+- [Setup Guide](docs/setup.md): Installation, API configuration, and Environment setup.
+- [Usage Guide](docs/usage.md): How to run the scraper and generator locally.
+- [Architecture Details](docs/architecture.md): Deep dive into the extraction and roadmap logic.
 
 ---
 
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**. Please read the [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to report bugs, suggest features, and submit Pull Requests.
+Contributions are welcome! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on reporting bugs or submitting pull requests.
 
 ---
 

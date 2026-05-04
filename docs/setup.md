@@ -1,45 +1,48 @@
 # Setup Guide
 
-This document outlines the steps required to configure the Data & AI Career Roadmap Generator on your local machine.
+This document outlines the steps required to configure the **Data & AI Career Roadmap Generator** for local development.
 
 ## Prerequisites
 
-- **Python 3.9+**: Ensure Python is installed and accessible in your system PATH.
-- **AgentRouter API Key**: An active API key from AgentRouter with access to the `claude-haiku-4-5-20251001` model.
+- **Python 3.11+**: Ensure Python is installed and accessible in your system PATH.
+- **Google Gemini API Key**: An active API key from [Google AI Studio](https://aistudio.google.com/) with access to the `gemini-2.0-flash` model.
 
 ## Installation
 
 1. **Clone the Repository**
-   Navigate to your desired directory and clone the project repository.
    ```bash
    git clone <repository-url>
    cd roadmap_webscraping
    ```
 
 2. **Install Python Dependencies**
-   Install the required libraries listed in `requirements.txt`. It is recommended to use a virtual environment.
+   It is highly recommended to use a virtual environment (Conda or venv).
    ```bash
    pip install -r requirements.txt
-   ```
-
-3. **Install Playwright Browsers**
-   The scraping pipeline requires Chromium to function in headless mode.
-   ```bash
-   playwright install chromium
+   pip install python-dotenv scrapling curl_cffi browserforge
    ```
 
 ## Configuration
 
-The project utilizes the AgentRouter API for LLM inference. The API key is configured directly within the source code.
+The project uses a `.env` file to manage sensitive API keys securely.
 
-**Updating the API Key**
-If you need to change the API key, update the `API_KEY` variable at the top of the following files:
-- `scripts/scraper_pipeline.py`
-- `scripts/roadmap_generator.py`
+1. **Create a .env file**
+   Create a file named `.env` in the root of the project (copying from `.env.example`).
+   ```bash
+   cp .env.example .env
+   ```
 
-```python
-# AgentRouter API Key
-API_KEY = "your_agentrouter_api_key_here"
-```
+2. **Add your API Key**
+   Open the `.env` file and paste your Gemini API key:
+   ```text
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
 
-*Security Note: Hardcoding API keys is not recommended for production environments. Consider migrating to environment variables before deploying to version control.*
+## Running Locally
+
+Once configured, you can run the pipeline components:
+
+- **ETL Scraper**: `python web/api/src/scraper_pipeline.py`
+- **Roadmap Generator**: `python web/api/src/roadmap_generator.py`
+
+*Note: The scripts automatically detect the `.env` file at the root and load your credentials.*

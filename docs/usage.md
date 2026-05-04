@@ -1,113 +1,72 @@
 # Usage Guide
 
-This guide explains how to execute the data pipelines and generate learning roadmaps.
+This guide explains how to execute the data pipelines and interact with the Career Roadmap system.
 
-## 1. Automated Pipeline (Recommended)
+## 1. Local Scraper Pipeline (ETL)
 
-The easiest way to execute the core ETL process is to use the automation script.
+The scraper pipeline searches for job listings across multiple platforms, extracts full job descriptions, and utilizes Gemini 2.0 Flash to identify technical skills.
 
 **Execution:**
 ```bash
-python automate.py
+python web/api/src/scraper_pipeline.py
 ```
-This script will sequentially run the scraper and generate the default roadmaps. To view the UI, you must launch the Docker containers (see section 2).
+
+**What it does:**
+-   **Multi-Board Fetching**: Scrapes LinkedIn, Wuzzuf, Indeed (EG), and Bayt.com.
+-   **Deep Analysis**: Sends raw descriptions to Gemini for context-aware technical skill extraction.
+-   **Data Persistence**: Saves results to both `data/egypt_data_skills.db` (SQLite) and `data/egypt_data_skills.parquet`.
+-   **Vercel Sync**: Automatically populates the `web/api/data/` folder for serverless deployment.
 
 ---
 
-## 2. Docker Execution
+## 2. Local Roadmap Generation
 
-You can run the entire pipeline in an isolated container without installing dependencies locally.
+The roadmap generator reads the aggregated skills for a specific role and uses AI to reason about dependencies and learning paths.
 
 **Execution:**
 ```bash
-docker-compose up --build
+python web/api/src/roadmap_generator.py
 ```
-This will build the images, run the `etl-worker` pipeline internally, host the `api-backend`, and map the Next.js frontend to `http://localhost:3000`.
+
+**What it does:**
+-   **Data Loading**: Reads from SQLite (primary) or Parquet (fallback).
+-   **Frequency Ranking**: Identifies the Top 15 most in-demand skills for each profile.
+-   **Pedagogical Logic**: Queries Gemini to build a sequential roadmap including "missing link" prerequisites.
+-   **Markdown Export**: Saves professional roadmaps to the `output/` directory.
 
 ---
 
-## 3. Manual Data Extraction Pipeline
+## 3. Local Web Development
 
-The scraper pipeline searches for job listings, extracts the job descriptions, and utilizes the AgentRouter API to dynamically identify technical skills.
+You can run the interactive Next.js dashboard locally to explore the data and generate roadmaps through a GUI.
 
-**Execution:**
-```bash
-python src/scraper_pipeline.py
-```
-
-**Process:**
-- Launches headless Playwright browser instances.
-- Targets specific profiles defined in `TARGET_PROFILES` (e.g., Data Engineer, ML Engineer).
-- Sends raw job descriptions to the `claude-haiku-4-5-20251001` model for strict JSON array extraction of tools.
-- Saves the aggregated data into `data/egypt_data_skills.parquet` and `data/market_trends.db`.
-
-## 4. Manual Roadmap Generation Pipeline
-
-The roadmap generator reads the processed data, calculates frequency distributions for a specific role, and prompts the LLM to build a sequential learning path.
+**Requirements:** Ensure your `.env` file contains your `GEMINI_API_KEY`.
 
 **Execution:**
 ```bash
-python src/roadmap_generator.py
-```
-
-**Process:**
-- Reads `data/egypt_data_skills.parquet`.
-- Filters for the target profile (configured in the `main` function).
-- Identifies the top 15 most frequently mentioned tools.
-- Queries the LLM to logically sequence the tools into a pedagogical roadmap.
-- Saves the output as a Markdown file in the `output/` directory.
-
-**Changing Target Profiles:**
-To generate a roadmap for a different role, modify the `target_profile` variable in `src/roadmap_generator.py`:
-```python
-def main():
-    target_profile = "Machine Learning Engineer" 
-    # ...
-```
-
-## 5. Next.js Web Frontend
-
-For a more user-friendly experience, you can use the Next.js web application. This interface allows you to visually explore the top skills and generate roadmaps with a single click.
-
-**Execution:**
-Ensure the FastAPI backend is running, then start the development server:
-```bash
-cd web
+# Install dependencies
 npm install
+
+# Start the dev server (Frontend + API)
 npm run dev
 ```
-Navigate to `http://localhost:3000` in your browser.
+Navigate to `http://localhost:3000`.
 
 **Features:**
-- Visually configure target profiles from the sidebar.
-- Visualize the top 15 most requested skills via an interactive Recharts bar chart.
-- Generate and view Claude AI roadmaps rendered cleanly via react-markdown.
+-   **Dynamic Charts**: Interactive Recharts visualizations of the current job market trends.
+-   **Live Roadmap Generation**: Click "Generate Roadmap" to trigger the serverless Gemini pipeline.
+-   **Job Explorer**: Browse the raw jobs scraped from the various job boards via the `/api/v1/jobs` endpoint.
 
-## 6. Jupyter Notebook Walkthrough
+---
 
-For learners and developers who want to understand the code execution step-by-step, the project includes an interactive Jupyter Notebook (`Data_Career_Roadmap.ipynb`).
+## 4. Automated Daily Updates (CI/CD)
 
-**Execution:**
-```bash
-jupyter notebook notebooks/Data_Career_Roadmap.ipynb
-```
+The project is fully automated via GitHub Actions. You do not need to run the scraper manually once deployed.
 
-**Features:**
-- Step-by-step execution of the scraping logic.
-- Real-time interaction with the AgentRouter Claude AI model for skill extraction.
-- Inline preview of the Pandas DataFrame.
-- Saving Parquet, SQLite, and Markdown roadmap files directly to the `output/` folder.
+**Workflow:**
+-   **Cron Trigger**: Runs every day at 00:00 UTC.
+-   **Execution**: Launches the Python pipeline in an Ubuntu container.
+-   **Auto-Commit**: Fresh market data is automatically committed back to the repository.
+-   **Vercel Deployment**: The commit triggers a fresh build on Vercel, ensuring your live app always shows today's data.
 
-## 7. FastAPI Backend Server
-
-A decoupled FastAPI backend has been implemented to serve the ETL data via REST APIs, paving the way for distinct web frontends (like Next.js).
-
-**Execution:**
-```bash
-uvicorn src.api.main:app --reload --port 8000
-```
-
-**Features:**
-- **Interactive API Docs:** Automatically generated Swagger UI available at `http://localhost:8000/docs`.
-- **Decoupled Architecture:** Cleanly separates the data layer (Parquet/SQLite) from the presentation layer.
-- **Robust Endpoints:** Fetch aggregated skills, market insights, and trigger Claude AI generation securely via REST calls.
+To trigger a manual update, go to the **Actions** tab in your GitHub repository and manually run the `Daily Job Market Scraper` workflow.
