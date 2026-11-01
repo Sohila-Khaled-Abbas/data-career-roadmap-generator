@@ -13,13 +13,8 @@ try:
 except ImportError:
     pass
 
-# API Key loaded from Environment Variable
-API_KEY = os.getenv("GEMINI_API_KEY")
-if not API_KEY:
-    raise ValueError("❌ CRITICAL ERROR: GEMINI_API_KEY environment variable is not set! Roadmap generation cannot proceed.")
-
+# Do not initialize the client at import time: public data endpoints work without an AI key.
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
-client = genai.Client(api_key=API_KEY)
 
 def load_and_aggregate_skills(df, target_profile):
     """
@@ -42,10 +37,10 @@ def load_and_aggregate_skills(df, target_profile):
 
 def generate_roadmap_with_llm(profile, skills):
     """
-    Uses Gemini 2.0 Flash to reason about skill dependencies and generate a Markdown roadmap.
+    Uses the configured Gemini Flash model to generate a Markdown roadmap.
     """
-    if not API_KEY:
-        print("❌ Error: GEMINI_API_KEY is not set.")
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
         return None
 
     print(f"🚀 Generating roadmap for {profile} using Gemini...")
@@ -68,6 +63,8 @@ def generate_roadmap_with_llm(profile, skills):
         Output only the Markdown content. Keep the tone professional, encouraging, and data-driven.
         """
         
+        # Client construction is intentionally lazy; failed credentials should not prevent API import.
+        client = genai.Client(api_key=api_key)
         response = client.models.generate_content(
             model=GEMINI_MODEL,
             contents=prompt

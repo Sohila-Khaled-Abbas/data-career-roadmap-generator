@@ -5,6 +5,8 @@ import pandas as pd
 import sqlite3
 import os
 import sys
+import re
+import logging
 from collections import Counter
 
 # Add src to path to import roadmap generator
@@ -24,7 +26,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,  # wildcard origins are not compatible with credentialed CORS
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -32,7 +34,16 @@ app.add_middleware(
 # Paths
 PARQUET_PATH = os.path.join(ROOT_DIR, "data", "egypt_data_skills.parquet")
 SQLITE_PATH = os.path.join(ROOT_DIR, "data", "market_trends.db")
-OUTPUT_DIR = os.path.join(ROOT_DIR, "output")
+OUTPUT_DIR = os.getenv("ROADMAP_OUTPUT_DIR", os.path.join(ROOT_DIR, "output"))
+logger = logging.getLogger(__name__)
+
+
+def roadmap_file_path(profile: str) -> str:
+    """Use a single safe filename component, even for untrusted role names."""
+    slug = re.sub(r"[^\w-]+", "_", profile.casefold(), flags=re.UNICODE).strip("_")[:80]
+    if not slug or slug in (".", ".."):
+        raise HTTPException(status_code=422, detail="Invalid roadmap profile name.")
+    return os.path.join(OUTPUT_DIR, f"roadmap_{slug}.md")
 
 # Pydantic Models
 class SkillFrequency(BaseModel):
@@ -125,46 +136,41 @@ def get_top_skills(
 
 @app.post("/api/v1/roadmaps/generate", response_model=RoadmapResponse, tags=["Roadmaps"])
 def generate_roadmap(request: RoadmapGenerateRequest):
-    """Trigger the Claude AI roadmap generation logic."""
+    """Generate a roadmap with Gemini while leaving the read-only API available offline."""
     if not request.skills:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Must provide at least one skill.")
-        
+        raise HTTPException(status_code=400, detail="Must provide at least one skill.")
+    if not os.getenv("GEMINI_API_KEY"):
+        raise HTTPException(status_code=503, detail="AI roadmap generation is not configured.")
+
+    filename = roadmap_file_path(request.profile)
     try:
-        # Call the existing LLM generator logic
         roadmap_md = generate_roadmap_with_llm(request.profile, request.skills)
-        if not roadmap_md:
-             raise HTTPException(
-                status_code=status.HTTP_502_BAD_GATEWAY,
-                detail="Failed to generate roadmap via AgentRouter API."
-            )
-            
-        # Optionally save the generated roadmap to the output folder
+    except Exception:
+        logger.exception("Roadmap generation failed.")
+        raise HTTPException(status_code=502, detail="AI roadmap generation failed.") from None
+    if not roadmap_md:
+        raise HTTPException(status_code=502, detail="AI roadmap generation is temporarily unavailable.")
+
+    try:
         os.makedirs(OUTPUT_DIR, exist_ok=True)
-        filename = os.path.join(OUTPUT_DIR, f"roadmap_{request.profile.replace(' ', '_').lower()}.md")
-        with open(filename, 'w', encoding='utf-8') as f:
-            f.write(roadmap_md)
-            
-        return RoadmapResponse(profile=request.profile, markdown=roadmap_md)
-    except Exception as e:
-         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error generating roadmap: {str(e)}"
-        )
+        with open(filename, "w", encoding="utf-8") as file:
+            file.write(roadmap_md)
+    except OSError:
+        # Read-only or ephemeral serverless filesystems must not break generation.
+        logger.warning("Roadmap generated but could not be saved on this instance.")
+    return RoadmapResponse(profile=request.profile, markdown=roadmap_md)
+
 
 @app.get("/api/v1/roadmaps/{profile}", response_model=RoadmapResponse, tags=["Roadmaps"])
 def get_saved_roadmap(profile: str = Path(..., title="The job profile to look for")):
-    """Retrieve a previously generated roadmap from the output directory."""
-    filename = os.path.join(OUTPUT_DIR, f"roadmap_{profile.replace(' ', '_').lower()}.md")
-    
-    if not os.path.exists(filename):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No saved roadmap found for profile: {profile}")
-        
+    """Retrieve a roadmap stored locally on this instance, if still available."""
+    filename = roadmap_file_path(profile)
+    if not os.path.isfile(filename):
+        raise HTTPException(status_code=404, detail="No saved roadmap found for this profile.")
     try:
-        with open(filename, 'r', encoding='utf-8') as f:
-            content = f.read()
-        return RoadmapResponse(profile=profile, markdown=content)
-    except Exception as e:
-         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to read saved roadmap: {str(e)}"
-        )
+        with open(filename, "r", encoding="utf-8") as file:
+            content = file.read()
+    except OSError:
+        logger.exception("Could not read saved roadmap.")
+        raise HTTPException(status_code=500, detail="Failed to read saved roadmap.") from None
+    return RoadmapResponse(profile=profile, markdown=content)
