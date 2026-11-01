@@ -47,10 +47,10 @@ graph TD
 
 - **Multi-Source Aggregation**: Scrapes and merges data from **LinkedIn, Wuzzuf, Indeed, and Bayt.com** to provide a comprehensive view of the Middle East and global data markets.
 - **15+ Specialized Profiles**: Tracks demand for roles from Data Analyst and BI Developer to MLOps, NLP, and Computer Vision Engineers.
-- **Deep AI Analysis**: Leverages `gemini-2.0-flash` with context-aware prompts to extract not just keywords, but essential technical concepts and related technologies.
+- **Deep AI Analysis**: Leverages `gemini-3.8-flash` with context-aware prompts to extract not just keywords, but essential technical concepts and related technologies.
 - **Intelligent Roadmaps**: Generates sequential learning paths that identify "missing links" (prerequisite tools) and explain the logical dependency between technologies (e.g., Python → Airflow).
 - **Dual-Storage Engine**: Uses **SQLite** for complex relational queries and **Apache Parquet** for high-performance serverless reads.
-- **Automated Daily Pipeline**: GitHub Actions orchestrates the entire ETL process every midnight, committing fresh data and keeping the live dashboard up-to-date.
+- **Automated Daily Pipeline**: GitHub Actions orchestrates the entire ETL process every midnight, attempting to refresh validated job data when the configured AI model and provider are available.
 - **Serverless API**: A unified FastAPI backend deployed as Vercel Functions, serving both pre-aggregated insights and real-time AI roadmap generation.
 - **Modern Web Dashboard**: An interactive Next.js application featuring glassmorphism design, Recharts visualizations, and 1-click personalized roadmaps.
 
@@ -61,7 +61,7 @@ graph TD
 ```text
 roadmap_webscraping/
 ├── .github/workflows/    # CI/CD (Daily Automated Scraper)
-├── .env                  # API Keys (Gemini)
+├── .env.example          # Safe API key template; real .env stays untracked
 ├── docs/                 # System documentation & guides
 ├── output/               # Generated Markdown roadmaps
 ├── docker/               # Containerization configurations
@@ -84,7 +84,7 @@ roadmap_webscraping/
 
 - **Orchestration**: GitHub Actions (Cron)
 - **Scraping Engine**: Scrapling (Stealth Fetching, curl_cffi, browserforge)
-- **AI/LLM**: Google GenAI SDK (`gemini-2.0-flash`)
+- **AI/LLM**: Google GenAI SDK (`gemini-3.8-flash`)
 - **Data Engineering**: Pandas, PyArrow, SQLite
 - **Environment**: python-dotenv
 - **Backend API**: FastAPI, Pydantic (Vercel Serverless)
@@ -110,3 +110,8 @@ Contributions are welcome! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) fo
 
 ## License
 Distributed under the MIT License. See `LICENSE` for more information.
+
+
+## Refresh reliability and model lifecycle
+
+The previous `gemini-2.0-flash` API model was discontinued June 1, 2026; this repository now defaults to `gemini-3.8-flash` and honors `GEMINI_MODEL` for future migrations. Confirm API key eligibility, quota, and provider costs before enabling recurring runs. The workflow skips data refresh (with a visible warning) if the `GEMINI_API_KEY` secret is missing; a failed or empty scrape raises an error and must **not** replace the prior API snapshot. Public job boards may block scraping or change their markup; a successful build is not proof of fresh market coverage. The workflow commits only the API dataset, leaving root `data/` exports ignored as designed.
