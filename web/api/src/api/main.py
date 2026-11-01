@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 
 def roadmap_file_path(profile: str) -> str:
     """Use a single safe filename component, even for untrusted role names."""
-    slug = re.sub(r"[^\\w-]+", "_", profile.casefold(), flags=re.UNICODE).strip("_")[:80]
+    slug = re.sub(r"[^\w-]+", "_", profile.casefold(), flags=re.UNICODE).strip("_")[:80]
     if not slug or slug in (".", ".."):
         raise HTTPException(status_code=422, detail="Invalid roadmap profile name.")
     return os.path.join(OUTPUT_DIR, f"roadmap_{slug}.md")
