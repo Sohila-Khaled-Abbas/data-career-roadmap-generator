@@ -35,6 +35,7 @@ if not API_KEY:
         "Set it via environment variable or a .env file."
     )
 
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
 client = genai.Client(api_key=API_KEY)
 
 # ── Target Profiles ────────────────────────────────────────────────────────
@@ -303,7 +304,7 @@ def extract_skills_dynamically(description_text: str) -> list:
         for attempt in range(5):
             try:
                 response = client.models.generate_content(
-                    model="gemini-2.0-flash",
+                    model=GEMINI_MODEL,
                     contents=prompt,
                 )
                 text = response.text.strip()
@@ -405,8 +406,10 @@ def main():
             print(f"  No jobs found for '{profile}' — skipping")
 
     if not all_records:
-        print("\n[ERROR] No data extracted at all. Check connectivity / blocking.")
-        return
+        raise RuntimeError("No jobs extracted; refusing to overwrite existing snapshots.")
+
+    if not any(record["skill_count"] > 0 for record in all_records):
+        raise RuntimeError("No skills extracted; check Gemini model access, credentials, and quota.")
 
     df = pd.DataFrame(all_records)
 

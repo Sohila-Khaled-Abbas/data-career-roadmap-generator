@@ -18,6 +18,7 @@ API_KEY = os.getenv("GEMINI_API_KEY")
 if not API_KEY:
     raise ValueError("❌ CRITICAL ERROR: GEMINI_API_KEY environment variable is not set! Roadmap generation cannot proceed.")
 
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
 client = genai.Client(api_key=API_KEY)
 
 def load_and_aggregate_skills(df, target_profile):
@@ -68,7 +69,7 @@ def generate_roadmap_with_llm(profile, skills):
         """
         
         response = client.models.generate_content(
-            model='gemini-2.0-flash',
+            model=GEMINI_MODEL,
             contents=prompt
         )
         return response.text
